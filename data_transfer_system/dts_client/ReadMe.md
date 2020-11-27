@@ -8,7 +8,7 @@
   
 2. 블루투스 모듈 설치
   $ sudo apt install bluetooth bluez libbluetooth-dev
-  $ sudo apt install sudo python3 -m pip install pybluez
+  $ sudo python3 -m pip install pybluez
   
 3. 블루투스 다시 연결
   $ sudo nano /boot/config.txt 
