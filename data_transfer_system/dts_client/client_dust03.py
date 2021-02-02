@@ -21,7 +21,7 @@ cnt=0
 recv_list=[]
 Tcp= TcpNet.TcpNet()
 Tcp.Connect(HOST,PORT)
-system_id = 'device0005'
+system_id = 'device0007'
 
 def format_data(msg):
     msg_list = msg.split(" ")
@@ -74,10 +74,10 @@ while True:
         
         Tcp.SendStr("exit")
         break
-while True:
+#while True:
     # 아두이노로 led on/off 값 전달
-    send_arduino = "1"
-    bt_s.send(send_arduino)
+#    send_arduino = "1"
+#    bt_s.send(send_arduino)
 
 bt_s.close()
 Tcp.Close()
