@@ -6,22 +6,23 @@ import bluetooth
 import TcpNet
 import datetime
 
-HOST = "203.234.62.115"
+HOST = "203.234.62.109"
 PORT = 11201
 BUFSIZE=1024
 
 bt_addr="20:16:12:22:21:76"
 bt_port=1
 
+led_s="0"
 # 아두이노 데이터 받기위한 블루투스 소켓
 bt_s=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 bt_s.connect((bt_addr,bt_port))
 send_data=""
 cnt=0
 recv_list=[]
-Tcp= TcpNet.TcpNet()
-Tcp.Connect(HOST,PORT)
-system_id = 'device0005'
+#Tcp= TcpNet.TcpNet()
+#Tcp.Connect(HOST,PORT)
+#system_id = 'device0004'
 
 def format_data(msg):
     msg_list = msg.split(" ")
@@ -38,14 +39,15 @@ def format_data(msg):
     print(send_data)
     return send_data
 
-while True:
-    Tcp.SendStr(system_id)
+#while True:
+#    Tcp.SendStr(system_id)
         
-    if Tcp.ReceiveStr() == "yes":
-        break;
-    elif Tcp.ReceiveStr() == "no":
-        print(">> 등록되지 않은 기기입니다!")
-        sys.exit(0)        
+#    if Tcp.ReceiveStr() == "yes":
+#        break;
+#    elif Tcp.ReceiveStr() == "no":
+#        print(">> 등록되지 않은 기기입니다!")
+#        sys.exit(0)
+
 while True:
     try:
         recv_string = ""
@@ -54,6 +56,7 @@ while True:
         while True:
             recv_msg = bt_s.recv(BUFSIZE).decode()
             recv_string = recv_string + recv_msg
+            #print(".")
             
             if recv_string[len(recv_string)-1] == "!":
                 break
@@ -64,21 +67,23 @@ while True:
         print(arduino_num)
         print(recv_data)
         
+       
         send_data = format_data(recv_data)
         # 서버로 데이터 전송하기 위한 소켓
-        Tcp.SendStr('send')
-        if(Tcp.ReceiveStr()=='con'):
-            Tcp.SendStr(send_data)
+        #Tcp.SendStr('send')
+        #if(Tcp.ReceiveStr()=='con'):
+        #    Tcp.SendStr(send_data)
+
+        if (led_s=="1"):
+            led_s="0"
+            bt_s.send(led_s)
+        else:
+            led_s="1"
+            bt_s.send(led_s)
         
     except KeyboardInterrupt:
         
         Tcp.SendStr("exit")
         break
-while True:
-    # 아두이노로 led on/off 값 전달
-    send_arduino = "1"
-    bt_s.send(send_arduino)
-
 bt_s.close()
-Tcp.Close()
-
+#Tcp.Close()
