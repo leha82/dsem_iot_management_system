@@ -60,7 +60,7 @@ class TcpServer:
             receive_data=self.Tcp.ReceiveStr()
             print("receive_data:"+receive_data)
             input_data=receive_data.split('!')
-            num=self.curs.execute("SELECT metadata_value FROM "+self.DeviceRegistry_DB_name+'.'+self.Specific_table_name+" WHERE item_id = "+self.package_V(self.item_id)+" AND (metadata_key like "+self.package_V('sensor-%')+");") # 특정 table의 칼럼값을 가져옴
+            num=self.curs.execute("SELECT metadata_value FROM "+self.DeviceRegistry_DB_name+'.'+self.Specific_table_name+" WHERE item_id = "+self.package_V(self.item_id)+" AND (metadata_key like "+self.package_V('sensor-%') + " OR metadata_key like " + self.package_V('actuator-%') +");") # 특정 table의 칼럼값을 가져옴
             DB_column=self.curs.fetchall()
             DB_sql='INSERT INTO '+ self.Sensor_DB_name+'.'+self.table_name+' ( timestamp,'
             for i in DB_column:
