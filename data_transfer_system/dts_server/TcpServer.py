@@ -86,6 +86,18 @@ class TcpServer:
             self.curs.execute(DB_sql)
             self.conn.commit()
             ack=None
+            
+            # Actuator data
+            num2=self.curs.execute("SELECT count(*) FROM Information_schema.tables WHERE table_schema='" + self.Sensor_DB_name + "' AND table_name='" + self.table_name + "_act';")
+            if(num2 == 0):
+                self.Tcp.SendStr('noAct')
+            elif(num2 == 1):
+                self.curs.execute("SELECT led FROM " + self.Sensor_DB_name + "." + self.table_name + "_act;")
+                rs = self.curs.fetchone()
+                led_s = rs[0]
+                self.Tcp.SendStr(str(led_s))
+                self.conn.commit()
+            
             if receive_data =='exit':
                 print('socket end')
                 break
