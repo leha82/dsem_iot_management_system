@@ -92,8 +92,8 @@ class TcpServer:
             if(num2 == 0):
                 self.Tcp.SendStr('noAct')
             elif(num2 == 1):
-                self.curs.execute("SELECT led FROM " + self.Sensor_DB_name + "." + self.table_name + "_act;")
-                #self.curs.execute("SELECT led FROM " + self.Sensor_DB_name + "." + self.table_name + "_act order by timestamp desc limit 1;")
+                #self.curs.execute("SELECT led FROM " + self.Sensor_DB_name + "." + self.table_name + "_act;")
+                self.curs.execute("SELECT led FROM " + self.Sensor_DB_name + "." + self.table_name + "_act order by timestamp desc limit 1;")
                 rs = self.curs.fetchone()
                 led_s = rs[0]
                 self.Tcp.SendStr(str(led_s))
