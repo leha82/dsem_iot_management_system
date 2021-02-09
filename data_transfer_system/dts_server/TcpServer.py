@@ -89,14 +89,18 @@ class TcpServer:
             
             # Actuator data
             num2=self.curs.execute("SELECT count(*) FROM Information_schema.tables WHERE table_schema='" + self.Sensor_DB_name + "' AND table_name='" + self.table_name + "_act';")
-            if(num2 == 0):
-                self.Tcp.SendStr('noAct')
-            elif(num2 == 1):
-                #self.curs.execute("SELECT led FROM " + self.Sensor_DB_name + "." + self.table_name + "_act;")
-                self.curs.execute("SELECT led FROM " + self.Sensor_DB_name + "." + self.table_name + "_act order by timestamp desc limit 1;")
+
+            if(num2 == 1):
+                self.curs.execute("SELECT actuator, statur FROM " + self.Sensor_DB_name + "." + self.table_name + "_act limit 1;")
                 rs = self.curs.fetchone()
-                led_s = rs[0]
-                self.Tcp.SendStr(str(led_s))
+                actuator=rs[0]
+                status=rs[1]
+                msg=actuator+":"+status
+                self.Tcp.SendStr(msg)
+                self.conn.commit()
+                
+                delete_sql="DELETE FROM " + self.Sensor_DB_name + "." + self.table_name + "_act limit 1;"
+                self.curs.execute(delete_sql)
                 self.conn.commit()
             
             if receive_data =='exit':
