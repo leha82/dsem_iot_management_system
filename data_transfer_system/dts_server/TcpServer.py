@@ -8,13 +8,16 @@
 # 외부 모듈 socket,pymysql  설치해야함 
 # 예외처리가 매우 미흡함으로 나중에 개선할 것 !!!!! 중요 !!!!!
 import TcpNet
+import threading
+
 try:
     import pymysql
 except ImportError:
     print('not pymysql')
+
 class TcpServer():
     def __init__(self, port=11000, DB_h='203.234.62.115',DB_u='root',DB_p='1234',DeviceRegistry_DB_name='DeviceRegistry',Sensor_DB_name="DeviceMeasurement",DB_s='specific_metadata',DB_r='device_register'):
-        self.Tcp = TcpNet.TcpNet()
+        # self.Tcp = TcpNet.TcpNet()
         self.HOST= TcpNet.ipcheck(); # 서버 ip주소 자신의 아이피로 자동 할당
         print("set HOST:"+self.HOST)
         self.PORT= port # 포트 는 10000이상으로 쓰고 겹치지 않는지 확인하며 할당 할 것
@@ -34,33 +37,36 @@ class TcpServer():
         print('DB connected.....')
     def package_V(self,s): # 문자열 쌓아주는 함수
         return '\''+str(s)+'\''
-        
-  
+
     def run(self):
-        print('waiting')
-        self.Tcp.Accept(IP=self.HOST,Port=self.PORT)
-       
+        while True:
+            server_tcp = TcpNet.TcpNet()
+            print('waiting')
+            server_tcp.Accept(IP=self.HOST,Port=self.PORT)
+            server_thread = threading.Thread(target=executeThread, args=(server_tcp,))
+
+    def executeThread(self, Tcp):
         try:
-            receive_id=self.Tcp.ReceiveStr()
+            receive_id=Tcp.ReceiveStr()
             #print(receive_id)
             self.curs.execute("SELECT system_id,table_name, item_id FROM "+self.DeviceRegistry_DB_name+"."+self.Device_Register_table_name +" WHERE system_id = " +self.package_V(receive_id)+";")
             result = self.curs.fetchone()
             if(result[0] is not None):
                 self.table_name=result[1]
                 self.item_id=result[2]
-                self.Tcp.SendStr('yes')
+                Tcp.SendStr('yes')
             else:
-                self.Tcp.SendStr('no')
+                Tcp.SendStr('no')
                 print('조회가 되질 않습니다')
         except Exception as e :
-            self.Tcp.SendStr('no')
+            Tcp.SendStr('no')
             print('error :', e)
         print(receive_id, ' Connected............')
         while True:
-            ack = self.Tcp.ReceiveStr()
+            ack = Tcp.ReceiveStr()
             if(ack=='send'):
-                self.Tcp.SendStr('con')
-            receive_data=self.Tcp.ReceiveStr()
+                Tcp.SendStr('con')
+            receive_data=Tcp.ReceiveStr()
             if receive_data != "":
                 print("receive_data:"+receive_data)
                 input_data=receive_data.split('!')
@@ -101,7 +107,7 @@ class TcpServer():
                 cnt=rs[0]
                 
                 if(num2 == 1 and cnt > 0 ):
-                    self.Tcp.SendStr('yesAct')
+                    Tcp.SendStr('yesAct')
                     self.curs.execute("SELECT DISTINCT actuator FROM " + self.Sensor_DB_name + "." + self.table_name + "_act;")
                     act2 = self.curs.fetchall()
                     newlist = [data[0] for data in act2]
@@ -113,14 +119,14 @@ class TcpServer():
                             actuator=rs[0]
                             status=rs[1]
                             msg=actuator + ":" + status
-                            self.Tcp.SendStr(msg)
+                            Tcp.SendStr(msg)
                             #print(msg)
                         
                         delete_sql = "DELETE FROM " + self.Sensor_DB_name + "." + self.table_name + "_act WHERE actuator='" + i + "';"
                         self.curs.execute(delete_sql)
                         self.conn.commit()
                 else:
-                    self.Tcp.SendStr('noAct')
+                    Tcp.SendStr('noAct')
             else:
                 print(receive_id, ' Disconnected............')
                 break

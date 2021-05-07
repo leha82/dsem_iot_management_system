@@ -5,6 +5,7 @@
 
 import TcpServer
 import json
+
 server = TcpServer.TcpServer()
 file_path = './config.json'
 with open(file_path, "r") as fj:
@@ -19,6 +20,4 @@ with open(file_path, "r") as fj:
     h = fd['Device_Register_table_name']
 server=TcpServer.TcpServer(a,b,c,d,e,f,g,h)
 server.DB_Con()
-
-while True:
-    server.run()
+server.run()
