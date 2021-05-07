@@ -12,7 +12,7 @@ try:
     import pymysql
 except ImportError:
     print('not pymysql')
-class TcpServer:
+class TcpServer():
     def __init__(self, port=11000, DB_h='203.234.62.115',DB_u='root',DB_p='1234',DeviceRegistry_DB_name='DeviceRegistry',Sensor_DB_name="DeviceMeasurement",DB_s='specific_metadata',DB_r='device_register'):
         self.Tcp = TcpNet.TcpNet()
         self.HOST= TcpNet.ipcheck(); # 서버 ip주소 자신의 아이피로 자동 할당
@@ -34,12 +34,15 @@ class TcpServer:
         print('DB connected.....')
     def package_V(self,s): # 문자열 쌓아주는 함수
         return '\''+str(s)+'\''
+        
+  
     def run(self):
         print('waiting')
         self.Tcp.Accept(IP=self.HOST,Port=self.PORT)
+       
         try:
             receive_id=self.Tcp.ReceiveStr()
-            print(receive_id)
+            #print(receive_id)
             self.curs.execute("SELECT system_id,table_name, item_id FROM "+self.DeviceRegistry_DB_name+"."+self.Device_Register_table_name +" WHERE system_id = " +self.package_V(receive_id)+";")
             result = self.curs.fetchone()
             if(result[0] is not None):
@@ -52,57 +55,76 @@ class TcpServer:
         except Exception as e :
             self.Tcp.SendStr('no')
             print('error :', e)
-        print('Connected............')
+        print(receive_id, ' Connected............')
         while True:
             ack = self.Tcp.ReceiveStr()
             if(ack=='send'):
                 self.Tcp.SendStr('con')
             receive_data=self.Tcp.ReceiveStr()
-            print("receive_data:"+receive_data)
-            input_data=receive_data.split('!')
-            num=self.curs.execute("SELECT metadata_value FROM "+self.DeviceRegistry_DB_name+'.'+self.Specific_table_name+" WHERE item_id = "+self.package_V(self.item_id)+" AND (metadata_key like "+self.package_V('sensor-%') + " OR metadata_key like " + self.package_V('actuator-%') +");") # 특정 table의 칼럼값을 가져옴
-            DB_column=self.curs.fetchall()
-            DB_sql='INSERT INTO '+ self.Sensor_DB_name+'.'+self.table_name+' ( timestamp,'
-            for i in DB_column:
-                for j in i:
-                    DB_sql = DB_sql+j+','
-            DB_sql= DB_sql[:len(DB_sql)-1]+') VALUES ('
-            a= self.package_V(input_data[0])
-            input_data=input_data[1:]
-            data_list=[]
-            for i in input_data:
-                data_list.append(i.split(':'))
-            data_dict = dict(data_list)
-            input_data=[]
-            for i in DB_column:
-                for j in i:
-                    if j in data_dict:
-                        input_data.append(data_dict[j])
-                    else:
-                        input_data.append('NULL')
-            input_data.insert(0,(a))
-            s=",".join(input_data)
-            DB_sql= DB_sql+s+');'
-            self.curs.execute(DB_sql)
-            self.conn.commit()
-            ack=None
-            
-            # Actuator data
-            num2=self.curs.execute("SELECT count(*) FROM Information_schema.tables WHERE table_schema='" + self.Sensor_DB_name + "' AND table_name='" + self.table_name + "_act';")
+            if receive_data != "":
+                print("receive_data:"+receive_data)
+                input_data=receive_data.split('!')
+                num=self.curs.execute("SELECT metadata_value FROM "+self.DeviceRegistry_DB_name+'.'+self.Specific_table_name+" WHERE item_id = "+self.package_V(self.item_id)+" AND (metadata_key like "+self.package_V('sensor-%') + " OR metadata_key like " + self.package_V('actuator-%') +");") # 특정 table의 칼럼값을 가져옴
+                DB_column=self.curs.fetchall()
+                DB_sql='INSERT INTO '+ self.Sensor_DB_name+'.'+self.table_name+' ( timestamp,'
+                for i in DB_column:
+                    for j in i:
+                        DB_sql = DB_sql+j+','
+                DB_sql= DB_sql[:len(DB_sql)-1]+') VALUES ('
+                a= self.package_V(input_data[0])
+                input_data=input_data[1:]
+                data_list=[]
+                for i in input_data:
+                    data_list.append(i.split(':'))
+                data_dict = dict(data_list)
+                input_data=[]
+                for i in DB_column:
+                    for j in i:
+                        if j in data_dict:
+                            input_data.append(data_dict[j])
+                        else:
+                            input_data.append('NULL')
+                input_data.insert(0,(a))
+                s=",".join(input_data)
+                DB_sql= DB_sql+s+');'
+                self.curs.execute(DB_sql)
+                self.conn.commit()
+                ack=None
 
-            if(num2 == 1):
-                self.curs.execute("SELECT actuator, statur FROM " + self.Sensor_DB_name + "." + self.table_name + "_act limit 1;")
+            # Actuator data
+                self.curs.execute("SELECT count(*) FROM Information_schema.tables WHERE table_schema='" + self.Sensor_DB_name + "' AND table_name='" + self.table_name + "_act';")
                 rs = self.curs.fetchone()
-                actuator=rs[0]
-                status=rs[1]
-                msg=actuator+":"+status
-                self.Tcp.SendStr(msg)
-                self.conn.commit()
+                num2=rs[0]
                 
-                delete_sql="DELETE FROM " + self.Sensor_DB_name + "." + self.table_name + "_act limit 1;"
-                self.curs.execute(delete_sql)
-                self.conn.commit()
-            
+                cnt=self.curs.execute("SELECT COUNT(*) FROM " + self.Sensor_DB_name + "." + self.table_name + "_act;")
+                rs = self.curs.fetchone()
+                cnt=rs[0]
+                
+                if(num2 == 1 and cnt > 0 ):
+                    self.Tcp.SendStr('yesAct')
+                    self.curs.execute("SELECT DISTINCT actuator FROM " + self.Sensor_DB_name + "." + self.table_name + "_act;")
+                    act2 = self.curs.fetchall()
+                    newlist = [data[0] for data in act2]
+                    
+                    for i in newlist:
+                        self.curs.execute("SELECT actuator, status FROM " + self.Sensor_DB_name + "." + self.table_name + "_act WHERE actuator='" + i + "' order by timestamp desc limit 1;")
+                        rs = self.curs.fetchone()
+                        if rs is not None:
+                            actuator=rs[0]
+                            status=rs[1]
+                            msg=actuator + ":" + status
+                            self.Tcp.SendStr(msg)
+                            #print(msg)
+                        
+                        delete_sql = "DELETE FROM " + self.Sensor_DB_name + "." + self.table_name + "_act WHERE actuator='" + i + "';"
+                        self.curs.execute(delete_sql)
+                        self.conn.commit()
+                else:
+                    self.Tcp.SendStr('noAct')
+            else:
+                print(receive_id, ' Disconnected............')
+                break
+                
             if receive_data =='exit':
                 print('socket end')
                 break
