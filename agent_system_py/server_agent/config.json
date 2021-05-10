@@ -1,0 +1,10 @@
+{
+    "PORT": 11201, 
+    "DB_Host": "203.234.62.115", 
+    "DB_User": "dsem_iot", 
+    "DB_password": "dsem_iot", 
+    "DeviceRegistry_DB_name": "DeviceRegistry", 
+    "Sensor_DB_name":"DeviceMeasurement", 
+    "Specific_table_name": "specific_metadata",
+    "Device_Register_table_name": "device_list"
+}
