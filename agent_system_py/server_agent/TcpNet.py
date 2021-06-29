@@ -14,7 +14,7 @@ class TcpNet:
 
     def Accept(self,IP,Port): # 주소랑 포트에 열어주기
         self.com_socket.bind((IP,Port))
-        self.com_socket.listen(10);
+        self.com_socket.listen(10)
         self.Connection, self.address = self.com_socket.accept()
 
     def Connect(self,IP,Port): # 그 주소의 포트에 연결하기

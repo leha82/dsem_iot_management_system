@@ -3,8 +3,8 @@ try:
 except ImportError:
     print('not pymysql')
 
-class DBManager():
-    def __init__(self, port=11000, DB_h='localhost',DB_u='dsem_iot',DB_p='dsem_iot',DR_DB_NAME='DeviceRegistry',Sensor_DB_name="DeviceMeasurement",DB_s='specific_metadata',DB_r='device_register'):
+class dbmanager():
+    def __init__(self, port=11000, DB_h='203.234.62.115',DB_u='dsem_iot',DB_p='dsem_iot',DR_DB_NAME='DeviceRegistry',Sensor_DB_name="DeviceMeasurement",DB_s='specific_metadata',DB_r='device_register'):
         # self.HOST= TcpNet.ipcheck(); # 서버 ip주소 자신의 아이피로 자동 할당
         # print("set HOST:"+self.HOST)
         # self.PORT= port # 포트 는 10000이상으로 쓰고 겹치지 않는지 확인하며 할당 할 것
@@ -50,31 +50,23 @@ class DBManager():
         DB_column=self.curs.fetchall()
         return DB_column
 
-    def insert_data(self, key, value):
+    def insert_data(self, input_list):
         DB_sql='INSERT INTO '+ self.Sensor_DB_name+'.'+self.table_name+' ( timestamp,'
-        
-        #이부분 수정해야 함
-        # key, value 리스트에 있는 것들을 모두 insert sql로 만들어서 execute 시킴
-        
-        # for i in DB_column:
-        #     for j in i:
-        #         DB_sql = DB_sql+j+','
-        # DB_sql= DB_sql[:len(DB_sql)-1]+') VALUES ('
-        # a= self.package_V(input_data[0])
-        # input_data=input_data[1:]
-        # data_list=[]
-        # for i in input_data:
-        #     data_list.append(i.split(':'))
-        # data_dict = dict(data_list)
-        # input_data=[]
-        # for i in DB_column:
-        #     for j in i:
-        #         if j in data_dict:
-        #             input_data.append(data_dict[j])
-        #         else:
-        #             input_data.append('NULL')
-        # input_data.insert(0,(a))
-        # s=",".join(input_data)
-        # DB_sql= DB_sql+s+');'
-        # self.curs.execute(DB_sql)
-        # self.conn.commit()
+        # key
+        for i in range(len(input_list)):
+            key = input_list[i][0]
+            if i == len(input_list) -1:
+                DB_sql = DB_sql + key
+            else:
+                DB_sql = DB_sql + key +', '
+        DB_sql= DB_sql[:len(DB_sql)]+') VALUES (' 
+        # value
+        for i in range(len(input_list)):
+            value = input_list[i][1]
+            if i == len(input_list)-1:
+                DB_sql = DB_sql +"'"+value + "'"
+            else:
+                DB_sql = DB_sql + "'"+value + "',"
+        DB_sql= DB_sql+');'
+        self.curs.execute(DB_sql)
+        self.conn.commit()
