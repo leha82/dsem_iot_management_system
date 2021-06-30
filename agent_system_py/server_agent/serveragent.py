@@ -1,8 +1,7 @@
 import json
 import threading
-import SensorCollector
-import DBManager
-
+from .SensorCollector import SensorCollector
+from .DBManager import DBManager
 
 if __name__ == "__main__":
     file_path = 'config.json'

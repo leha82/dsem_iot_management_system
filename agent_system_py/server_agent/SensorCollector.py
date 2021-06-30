@@ -1,6 +1,6 @@
 import threading
 import socket
-import DBManager
+from .DBManager import DBManager
 
 # try:
 #     import pymysql
