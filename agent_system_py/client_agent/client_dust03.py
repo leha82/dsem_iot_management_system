@@ -1,7 +1,7 @@
 import socket
 from select import *
 import sys
-import bluetooth
+from .. import bluetooth
 import json
 import datetime
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         recv_msg = tcpReceive(client_socket)
         
         if recv_msg == "yes":
-            break;
+            break
         elif recv_msg == "no":
             print(">> 등록되지 않은 기기입니다!")
             sys.exit(0)        
