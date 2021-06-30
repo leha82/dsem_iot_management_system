@@ -1,4 +1,6 @@
 import json
+import TcpServer
+import dbmanager
 
 if __name__ == "__main__":
     server = TcpServer.TcpServer()
@@ -13,12 +15,13 @@ if __name__ == "__main__":
         f = fd['Sensor_DB_name']
         g = fd['Specific_table_name']
         h = fd['Device_Register_table_name']
-    dbm = DBManager(b,c,d,e,f,g,h)
+    dbm = dbmanager.dbmanager(a,b,c,d,e,f,g,h)
     dbm.DB_Con()
-    server=TcpServer.TcpServer(dbm, a)
-    while True:
-        # server.runSensorManager()
-        # server.runActuatorManager()
+    server=TcpServer.TcpServer(dbm, b,11201,11202)
 
-        sensor_thread = threading.Thread(target=server.sensorThread, args=())
-        actuator_thread = threading.Thread(target=server.actuatorThread, args=())
+    while True:
+        server.runSensorManager()
+        server.runActuatorManager()
+
+        #sensor_thread = threading.Thread(target=server.sensorThread, args=())
+        #actuator_thread = threading.Thread(target=server.actuatorThread, args=())
