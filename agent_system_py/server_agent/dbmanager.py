@@ -3,8 +3,8 @@ try:
 except ImportError:
     print('not pymysql')
 
-class dbmanager():
-    def __init__(self, port=11000, DB_h='203.234.62.115',DB_u='dsem_iot',DB_p='dsem_iot',DR_DB_NAME='DeviceRegistry',Sensor_DB_name="DeviceMeasurement",DB_s='specific_metadata',DB_r='device_register'):
+class DBManager:
+    def __init__(self, DB_h='203.234.62.115',DB_u='dsem_iot',DB_p='dsem_iot',DR_DB_NAME='DeviceRegistry',Sensor_DB_name="DeviceMeasurement",DB_s='specific_metadata',DB_r='device_register'):
         # self.HOST= TcpNet.ipcheck(); # 서버 ip주소 자신의 아이피로 자동 할당
         # print("set HOST:"+self.HOST)
         # self.PORT= port # 포트 는 10000이상으로 쓰고 겹치지 않는지 확인하며 할당 할 것
@@ -36,11 +36,9 @@ class dbmanager():
                 table_name=result[1]
                 item_id=result[2]
             else:
-                Tcp.SendStr('no')
-                print('조회가 되질 않습니다')
+                return None, None
         except Exception as e :
-            Tcp.SendStr('no')
-            print('error :', e)
+            return None, None
         return table_name, item_id
 
     def get_sensor_actuator_list(self, item_id):

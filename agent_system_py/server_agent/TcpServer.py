@@ -8,12 +8,12 @@ import dbmanager
 # except ImportError:
 #     print('not pymysql')
 
-class TcpServer():
+class TcpServer:
     def __init__(self, dbmanager = dbmanager.dbmanager(), server_host='localhost', sensor_manager_port=11201, actuator_manager_port=11202):
         self.dbm = dbmanager
         
         if server_host == 'localhost':
-            tcp = TcpNet.TcpNet()
+            self.tcp = TcpNet.TcpNet()
             self.HOST = TcpNet.ipcheck() # 서버 ip주소 자신의 아이피로 자동 할당
             print("set HOST:"+self.HOST)
         else:
@@ -29,13 +29,13 @@ class TcpServer():
         tcp = TcpNet.TcpNet()
         print('Sensor Manamger waiting...')
         tcp.Accept(IP=self.HOST,Port=self.SM_PORT)
-        sensor_thread = threading.Thread(target=sensorThread, args=(tcp,))
+        sensor_thread = threading.Thread(target=self.sensorThread, args=(tcp,))
 
     def runActuatorManager(self):
         tcp = TcpNet.TcpNet()
         print('Actuator Manager waiting...')
         tcp.Accept(IP=self.HOST,Port=self.AM_PORT)
-        actuator_thread = threading.Thread(target=actuatorThread, args=(tcp,))
+        actuator_thread = threading.Thread(target=self.actuatorThread, args=(tcp,))
 
 
     def sensorThread(self):
@@ -45,9 +45,9 @@ class TcpServer():
 
         try:
             receive_id=Tcp.ReceiveStr()
-            table_name, item_id = dbm.get_item_list(receive_id)
+            table_name, item_id = self.dbm.get_item_list(receive_id)
 
-            if table_name != null and item_id != null:
+            if table_name != None and item_id != None:
                 Tcp.SendStr('yes')
                 print('Connected : ', receive_id, ' [item id : ',item_id,']')
             else:
@@ -71,7 +71,7 @@ class TcpServer():
                 key_value_list=input_data[i].split(':')
 
             # Specific metadata에 저장된 sensor 및 actuator를 받아와 list up 시킴
-            DB_column=dbm.get_sensor_actuator_list(item_id)
+            DB_column=self.dbm.get_sensor_actuator_list(item_id)
 
             # DB_column의 리스트와 key 리스트를 비교하여 key 리스트의 값이 DB_column에 존재하지 않으면 해당 key는 db로 넣지 못함
             DB_column_list = []
@@ -85,7 +85,7 @@ class TcpServer():
                         input_list.append(key_value_list[i])
                     break
             # key, value 리스트를 dbm의 insert_data로 넣도록 함
-            dbm.insert_data(input_list)
+            self.dbm.insert_data(input_list)
 
     # 새로운 스레드
     def actuatorThread(self):
