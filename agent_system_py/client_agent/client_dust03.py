@@ -1,7 +1,8 @@
 import socket
 from select import *
 import sys
-from .. import bluetooth
+import bluetooth
+# from .. import bluetooth
 import json
 import datetime
 
@@ -59,6 +60,7 @@ if __name__ == "__main__":
     
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((HOST, PORT))
+    # client_socket.connect(('localhost', 11201))
     
     system_id = 'device0007'
 

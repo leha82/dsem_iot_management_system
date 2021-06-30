@@ -31,7 +31,7 @@ int LED_STATUS = 0;
 int cds = 0;
 
 // Device Number
-String arduino_num = "04";
+String arduino_num = "07";
 
 void setup() {
   Serial.begin(9600);        // 시리얼 통신 시작

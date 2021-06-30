@@ -1,6 +1,7 @@
 import threading
 import socket
-from .DBManager import DBManager
+import DBManager
+# from .DBManager import DBManager
 
 # try:
 #     import pymysql
@@ -8,41 +9,46 @@ from .DBManager import DBManager
 #     print('not pymysql')
 BUFFSIZE = 4096
 
-class SensorCollector:
-    def __init__(self, dbmanager = DBManager.DBManager(), server_host='localhost', sensor_manager_port=11201, actuator_manager_port=11202):
-        self.dbm = dbmanager
+class SensorCollector (threading.Thread):
+    def __init__(self, dbmanager = DBManager.DBManager(), server_host='localhost', sensor_manager_port=11201):
+        threading.Thread.__init__(self)
+
+        dbm = dbmanager
         if server_host == 'localhost':
             self.HOST = socket.gethostbyname(socket.getfqdn()) # 서버 ip주소 자신의 아이피로 자동 할당
             print("set HOST:"+self.HOST)
         else:
             self.HOST = server_host
             print(self.HOST)
-        self.HOST = 'localhost'
         self.PORT = sensor_manager_port # 포트 는 10000이상으로 쓰고 겹치지 않는지 확인하며 할당 할 것
 
     # def package_V(self,s): # 문자열 쌓아주는 함수
     #     return '\''+str(s)+'\''
 
-    def runSensorCollector(self):
+    def run(self):
         print('run Sensor Collector')
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server_socket.bind((self.HOST, self.PORT))
         server_socket.listen()
 
-        while True:
-            print('Sensor Manamger waiting...')
+        try:
+            while True:
+                print('Sensor Manamger waiting...')
 
-            client_socket, addr = server_socket.accept()
-            print('Connected by', addr)
+                client_socket, addr = server_socket.accept()
+                print('Connected by', addr)
 
-            sensor_thread = threading.Thread(target=self.thread, args=(client_socket, addr,))
+                sensor_thread = threading.Thread(target=self.thread, args=(client_socket, addr,))
+                
+        except KeyboardInterrupt:
+            print('동작을 중지하였습니다.')
 
-    def send(self, client_socket, message):
+    def send(client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
         print("sensor collector send : ", message)
 
-    def receive(self, client_socket):
+    def receive(client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
         print("sensor collector receive : ", recv_msg)
         return recv_msg
