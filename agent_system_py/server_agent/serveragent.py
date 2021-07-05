@@ -21,7 +21,7 @@ if __name__ == "__main__":
     print(server_ip)
     dbm = DBManager.DBManager(db_host, db_user, db_pw, dbn_dr, dbn_measure, tbl_specific, tbl_dl)
     dbm.DB_Con()
-#    server = TcpServer.TcpServer()
+    
     sensor_collector = SensorCollector.SensorCollector(dbm, server_ip, port_sensor)
     sensor_collector.start()
     sensor_collector.join()

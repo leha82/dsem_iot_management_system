@@ -2,10 +2,6 @@ import threading
 import socket
 import DBManager
 
-# try:
-#     import pymysql
-# except ImportError:
-#     print('not pymysql')
 BUFFSIZE = 4096
 
 class SensorCollector (threading.Thread):
@@ -20,9 +16,6 @@ class SensorCollector (threading.Thread):
             self.HOST = server_host
             print(self.HOST)
         self.PORT = sensor_manager_port # 포트 는 10000이상으로 쓰고 겹치지 않는지 확인하며 할당 할 것
-
-    # def package_V(self,s): # 문자열 쌓아주는 함수
-    #     return '\''+str(s)+'\''
 
     def run(self):
         print('run Sensor Collector')

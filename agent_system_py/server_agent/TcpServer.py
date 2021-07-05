@@ -2,10 +2,6 @@ import TcpNet
 import threading
 import DBManager
 
-# try:
-#     import pymysql
-# except ImportError:
-#     print('not pymysql')
 
 class TcpServer:
     def __init__(self, dbmanager = DBManager.dbmanager(), server_host='localhost', sensor_manager_port=11201, actuator_manager_port=11202):
