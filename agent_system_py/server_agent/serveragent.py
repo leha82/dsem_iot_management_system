@@ -2,11 +2,9 @@ import json
 import threading
 import DBManager
 import SensorCollector
-# from .SensorCollector import SensorCollector
-# from .DBManager import DBManager
 
 if __name__ == "__main__":
-    file_path = 'server_agent/config.json'
+    file_path = './server_agent/config.json'
     with open(file_path, "r") as fj:
         fd = json.load(fj)
         server_ip = fd['SERVER_IP']
@@ -25,9 +23,5 @@ if __name__ == "__main__":
     dbm.DB_Con()
 #    server = TcpServer.TcpServer()
     sensor_collector = SensorCollector.SensorCollector(dbm, server_ip, port_sensor)
-    sensor_collector.setDaemon(True)
     sensor_collector.start()
     sensor_collector.join()
-
-    # sensor_thread = threading.Thread(target=SensorCollector.execute, args=(sensor_collector))
-    #actuator_thread = threading.Thread(target=sensor_collector.actuatorThread, args=())

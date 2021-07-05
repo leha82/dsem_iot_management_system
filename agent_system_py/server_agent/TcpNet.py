@@ -37,7 +37,3 @@ class TcpNet:
 
     def GetHostIP():
         return socket.gethostbyname(socket.getfqdn())
-
-
-
-

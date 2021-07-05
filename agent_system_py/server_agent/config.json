@@ -1,5 +1,5 @@
 {
-    "SERVER_IP": "192.168.0.4",
+    "SERVER_IP": "203.234.62.112",
     "PORT_Sensor": 11201, 
     "PORT_Actuator": 11202, 
     "DB_Host": "203.234.62.115", 

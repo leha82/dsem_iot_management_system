@@ -39,25 +39,26 @@ class DBManager:
                 return None, None
         except Exception as e :
             return None, None
+        print(table_name, item_id)
         return table_name, item_id
 
     def get_sensor_actuator_list(self, item_id):
-        num=self.curs.execute("SELECT metadata_value FROM "+self.DeviceRegistry_DB_name+'.'+self.Specific_table_name+ \
+        num=self.curs.execute("SELECT metadata_value FROM "+self.DR_DB_NAME+'.'+self.Specific_table_name+ \
                             " WHERE item_id = "+self.addsq(item_id)+" AND (metadata_key like "+self.addsq('sensor-%') + \
                             " OR metadata_key like " + self.addsq('actuator-%') +");") # 특정 table의 칼럼값을 가져옴
         DB_column=self.curs.fetchall()
         return DB_column
 
-    def insert_data(self, input_list):
-        DB_sql='INSERT INTO '+ self.Sensor_DB_name+'.'+self.table_name+' ( timestamp,'
+    def insert_data(self, input_list, table_name):
+        DB_sql='INSERT INTO '+ self.Sensor_DB_name+'.'+ table_name +' ( timestamp, '
         # key
         for i in range(len(input_list)):
             key = input_list[i][0]
-            if i == len(input_list) -1:
+            if i == len(input_list) - 1:
                 DB_sql = DB_sql + key
             else:
                 DB_sql = DB_sql + key +', '
-        DB_sql= DB_sql[:len(DB_sql)]+') VALUES (' 
+        DB_sql= DB_sql[:len(DB_sql)]+') VALUES (now(), ' 
         # value
         for i in range(len(input_list)):
             value = input_list[i][1]
@@ -66,5 +67,6 @@ class DBManager:
             else:
                 DB_sql = DB_sql + "'"+value + "',"
         DB_sql= DB_sql+');'
+        print(DB_sql)
         self.curs.execute(DB_sql)
         self.conn.commit()

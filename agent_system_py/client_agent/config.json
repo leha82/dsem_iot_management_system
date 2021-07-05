@@ -1,8 +1,8 @@
 {
-    "SERVER_IP": "192.168.0.4",
+    "SERVER_IP": "203.234.62.112",
     "SERVER_PORT_SENSOR": 11201,
     "SERVER_PORT_ACTUATOR": 11202,
-    "BT_ADDR" : "20:16:12:22:21:76",
+    "BT_ADDR" : "98:D3:51:FD:B7:C7",
     "BT_PORT" : 1,
     "SYSTEM_ID" : "device0007"
 }

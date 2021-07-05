@@ -2,12 +2,9 @@ import socket
 from select import *
 import sys
 import bluetooth
-# from .. import bluetooth
 import json
 import datetime
 
-# HOST = "203.234.62.115"
-# PORT = 11201
 BUFFSIZE=1024
 
 # bt_addr="20:16:12:22:21:76"
@@ -102,4 +99,3 @@ if __name__ == "__main__":
 
     # bt_s.close()
     client_socket.close()
-
