@@ -31,7 +31,12 @@ int LED_STATUS = 0;
 int cds = 0;
 
 // Device Number
-String arduino_num = "07";
+String arduino_num = "04";
+
+// actuator status
+String msg = "";  
+String actuator = "";
+int value = 0;
 
 void setup() {
   Serial.begin(9600);        // 시리얼 통신 시작
@@ -119,12 +124,17 @@ void loop() {
 
   //BluetoothSerial Read
   while (BTSerial.available() > 0) {
-    char msg = (char)BTSerial.read();
-    
-    if (msg == '1'){
-      LED_STATUS = 1;
-    } else {
-      LED_STATUS = 0;
+    String recv = BTSerial.readString();
+    //Serial.println(recv);    // ex) led:1
+
+    int index1 = recv.indexOf(':');
+    int index2 = recv.length();
+    actuator = recv.substring(0, index1);  // led
+    value = recv.substring(index1+1, index2).toInt();  // 1
+    //Serial.println(value);
+
+    if (actuator == "led") {
+      LED_STATUS = value;
     }
   }
 }
