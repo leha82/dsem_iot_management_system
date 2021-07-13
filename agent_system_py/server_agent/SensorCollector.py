@@ -19,16 +19,16 @@ class SensorCollector (threading.Thread):
 
     def run(self):
         print('run Sensor Collector')
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server_socket.bind((self.HOST, self.PORT))
-        server_socket.listen()
+        server_socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket1.bind((self.HOST, self.PORT))
+        server_socket1.listen()
 
         try:
             while True:
                 print('Sensor Manager waiting...')
 
-                client_socket, addr = server_socket.accept()
+                client_socket, addr = server_socket1.accept()
                 print('Connected by', addr)
 
                 sensor_thread = threading.Thread(target=self.thread, args=(client_socket, addr,))
@@ -52,6 +52,7 @@ class SensorCollector (threading.Thread):
             print(receive_id)
 
             table_name, item_id = self.dbm.get_item_list(receive_id)
+            print("table name : ", table_name, ", item id : ", item_id)
 
             if table_name != None and item_id != None:
                 self.send(client_socket, 'yes')

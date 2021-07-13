@@ -19,7 +19,8 @@ class DBManager:
         self.curs = self.conn.cursor() # DB 커서
         print('DB connected.....')
 
-    def addsq(self,s): # 문자열 쌓아주는 함수
+    # 문자열 쌓아주는 함수
+    def addsq(self,s): 
         return '\''+str(s)+'\''
 
     def get_item_list(self, receive_id):
@@ -44,6 +45,42 @@ class DBManager:
         DB_column=self.curs.fetchall()
         return DB_column
 
+    # 해당 table이 존재하는지 아닌지를 0 또는 1로 표현
+    def get_information_cnt(self, table_name):
+        self.curs.execute("SELECT count(*) FROM Information_schema.tables WHERE table_schema='"+self.Sensor_DB_name+\
+                            "' AND table_name='"+table_name+"_act';")
+        rs = self.curs.fetchone()
+        num = rs[0]
+        return num
+
+    # 해당 table 내에 데이터 row가 존재하는지 아닌지 
+    def get_data_cnt(self, table_name):
+        print("SELECT count(*) FROM "+self.Sensor_DB_name+"."+table_name+"_act;")
+        self.curs.execute("SELECT count(*) FROM "+self.Sensor_DB_name+"."+table_name+"_act;")
+        rs = self.curs.fetchone()
+        num = rs[0]
+        return num
+
+    # Actuator 제어 요청(중복 없이) 가져오기
+    def get_distinct_actlist(self, table_name):
+        self.curs.execute("SELECT DISTINCT actuator FROM "+self.Sensor_DB_name+"."+table_name+"_act;")
+        act = self.curs.fetchall()
+        newlist = [data[0] for data in act]
+        return newlist
+
+    # key:value 형태로 actuator 데이터 가져오기
+    def get_keyValue_act(self, i, table_name):
+        self.curs.execute("SELECT actuator, status FROM "+self.Sensor_DB_name+"."+table_name+"_act WHERE actuator='"+i+\
+                                "' order by timestamp desc limit 1;")
+        rs = self.curs.fetchone()
+        return rs
+
+    # 사용한 actuator 데이터 삭제
+    def delete_actuator_data(self, i, table_name):
+        self.curs.execute("DELETE FROM " + self.Sensor_DB_name + "." + table_name + "_act WHERE actuator='" + i + "';")
+        self.conn.commit()
+
+    # 데이터 insert 함수
     def insert_data(self, input_list, table_name):
         DB_sql='INSERT INTO '+ self.Sensor_DB_name+'.'+ table_name +' ( timestamp, '
         # key

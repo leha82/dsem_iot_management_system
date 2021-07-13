@@ -2,6 +2,8 @@ import json
 import threading
 import DBManager
 import SensorCollector
+import ActuatorCollector
+
 
 if __name__ == "__main__":
     file_path = './server_agent/config.json'
@@ -21,7 +23,11 @@ if __name__ == "__main__":
     print(server_ip)
     dbm = DBManager.DBManager(db_host, db_user, db_pw, dbn_dr, dbn_measure, tbl_specific, tbl_dl)
     dbm.DB_Con()
-    
+
     sensor_collector = SensorCollector.SensorCollector(dbm, server_ip, port_sensor)
+    actuator_collector = ActuatorCollector.ActuatorCollector(dbm, server_ip, port_actuator)
     sensor_collector.start()
+    actuator_collector.start()
+
+    actuator_collector.join()
     sensor_collector.join()
