@@ -49,10 +49,10 @@ class SensorCollector (threading.Thread):
     def thread(self, client_socket, addr):
         try:
             receive_id = self.receive(client_socket)
-            print(receive_id)
+            #print(receive_id)
 
             table_name, item_id = self.dbm.get_item_list(receive_id)
-            print("table name : ", table_name, ", item id : ", item_id)
+            #print("table name : ", table_name, ", item id : ", item_id)
 
             if table_name != None and item_id != None:
                 self.send(client_socket, 'yes')
@@ -66,24 +66,24 @@ class SensorCollector (threading.Thread):
                 
             if receive_data != "":
                 # 보내는 데이터가 humidity=50.0!temperature=20.1!... 이런식으로 올 수 있도록
-                print("receive_data:"+receive_data)
+                #print("receive_data:"+receive_data)
                 input_data=receive_data.split('!')
                 # input_data를 key, value 리스트로 각각 분리해서 만들 수 있도록 해야함
                 key_value_list = []
                 for i in range(1, len(input_data)):
                     key_value_list.append(input_data[i].split(':'))
-                print("key_value_list : ", key_value_list)
+                #print("key_value_list : ", key_value_list)
 
                 # Specific metadata에 저장된 sensor 및 actuator를 받아와 list up 시킴
                 DB_column = []
                 DB_column=self.dbm.get_sensor_actuator_list(item_id)
-                print("DB_column : " , DB_column)
+                #print("DB_column : " , DB_column)
 
                 # DB_column의 리스트와 key 리스트를 비교하여 key 리스트의 값이 DB_column에 존재하지 않으면 해당 key는 db로 넣지 못함
                 DB_column_list = []
                 for i in range(len(DB_column)):
                     DB_column_list.append(DB_column[i][0])
-                print("DB_column_list : ", DB_column_list)
+                #print("DB_column_list : ", DB_column_list)
 
                 input_list = []
                 for i in range(len(key_value_list)):
@@ -91,7 +91,7 @@ class SensorCollector (threading.Thread):
                         if (DB_column_list[j] == key_value_list[i][0]):
                             input_list.append(key_value_list[i])
                             break
-                print("input_list : ", input_list)
+                #print("input_list : ", input_list)
 
                 # key, value 리스트를 dbm의 insert_data로 넣도록 함
                 self.dbm.insert_data(input_list, table_name)
