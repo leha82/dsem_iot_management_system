@@ -3,8 +3,10 @@ from select import *
 import sys
 import bluetooth
 import json
-import client_dust04_sensor
-import client_dust04_actuator
+import client_dust04_sensor as cs
+import client_dust04_actuator as ca
+
+# 아두이노에서 데이터 보낼때 컬럼 붙이기
 
 if __name__ == "__main__":
     file_path = 'config.json'
@@ -23,16 +25,16 @@ if __name__ == "__main__":
     print("Bluetooth Address : ", BT_ADDR, "Port : ", BT_PORT)
 
     # Bluetooth Socket
-    bt_s=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-    bt_s.connect((BT_ADDR,BT_PORT))
+    bt_socket=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    bt_socket.connect((BT_ADDR,BT_PORT))
     
-    client_sensor = client_dust04_sensor.client_dust04_sensor(bt_s, HOST, SYSTEM_ID, PORT_SENSOR)
-    client_actuator = client_dust04_actuator.client_dust04_actuator(bt_s, HOST, SYSTEM_ID, PORT_ACTUATOR)
+    sensor = cs.client_sensor(bt_socket, HOST, SYSTEM_ID, PORT_SENSOR)
+    actuator = ca.client_actuator(bt_socket, HOST, SYSTEM_ID, PORT_ACTUATOR)
     
-    client_sensor.start()
-    client_actuator.start()
+    sensor.start()
+    actuator.start()
     
-    client_sensor.join()
-    client_actuator.join()
+    sensor.join()
+    actuator.join()
     
-    bt_s.close()
+    bt_socket.close()

@@ -1,24 +1,20 @@
 import socket
 from select import *
 import sys
-import bluetooth
-import json
 import datetime
 import threading
 
 BUFFSIZE=1024
 
-# bt_addr="20:16:12:22:21:76"
-# bt_port=1
-
-class client_dust04_sensor(threading.Thread):
-    def __init__(self, bt_s, HOST, SYSTEM_ID, PORT_SENSOR):
+class client_sensor(threading.Thread):
+    def __init__(self, bt_socket, HOST, SYSTEM_ID, PORT_SENSOR):
         threading.Thread.__init__(self)
-        self.bt_s = bt_s
+        self.bt_socket = bt_socket
         self.HOST = HOST
         self.SYSTEM_ID = SYSTEM_ID
         self.PORT_SENSOR = PORT_SENSOR
 
+    # json 형태로 변환
     def format_data(self, msg):
         msg_list = msg.split(" ")
         
@@ -48,19 +44,21 @@ class client_dust04_sensor(threading.Thread):
         cnt=0
         recv_list=[]
         
+
         while True:
+            # 블루투스로 데이터 먼저 받고 -> 소켓 연결 -> 데이터 전송
+
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect((self.HOST, self.PORT_SENSOR))
         
-            while True:
-                self.tcpSend(client_socket, self.SYSTEM_ID)
-                recv_msg = self.tcpReceive(client_socket)
-            
-                if recv_msg == "yes":
-                    break
-                elif recv_msg == "no":
-                    print(">> This device is not registered!")
-                    sys.exit(0)
+            self.tcpSend(client_socket, self.SYSTEM_ID)
+            recv_msg = self.tcpReceive(client_socket)
+        
+            if recv_msg == "yes":
+                break
+            elif recv_msg == "no":
+                print(">> This device is not registered!")
+                sys.exit(0)
                     
             try:
                 recv_string = ""
@@ -68,15 +66,17 @@ class client_dust04_sensor(threading.Thread):
                 recv_data=""
                 
                 while True:
-                    recv_msg = self.bt_s.recv(BUFFSIZE).decode()
+                    # 아두이노에서 json형태로 변환할 수 있을지 확인해 볼 것.
+                    # 아두이노에서 system id 도 함께 보내줄 수 있도록
+                    recv_msg = self.bt_socket.recv(BUFFSIZE).decode()
                     recv_string = recv_string + recv_msg
                     
                     if recv_string[len(recv_string)-1] == "!":
                         break
                 
                 arduino_num = recv_string.split(":")[0]
-                recv_data = recv_string.split(":")[1]
-                recv_data = recv_data.replace("!","")
+                recv_data = recv_string.split(":")[1].replace("!", "")
+
                 print(arduino_num)
                 print(recv_data)
                 

@@ -9,10 +9,10 @@ import threading
 
 BUFFSIZE=1024
 
-class client_dust04_actuator(threading.Thread):
-    def __init__(self, bt_s, HOST, SYSTEM_ID, PORT_ACTUATOR):
+class client_actuator(threading.Thread):
+    def __init__(self, bt_socket, HOST, SYSTEM_ID, PORT_ACTUATOR):
         threading.Thread.__init__(self)
-        self.bt_s = bt_s
+        self.bt_socket = bt_socket
         self.HOST = HOST
         self.SYSTEM_ID = SYSTEM_ID
         self.PORT_ACTUATOR = PORT_ACTUATOR
@@ -26,25 +26,20 @@ class client_dust04_actuator(threading.Thread):
         #print("[artuator] tcp receive : ", recv_msg)
         return recv_msg
     
-    def run(self):
-        send_data=""
-        cnt=0
-        recv_list=[]     
+    def run(self):  
             
         while True:
             client_socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket1.connect((self.HOST, self.PORT_ACTUATOR))
-                
-                
-            while True:
-                self.tcpSend(client_socket1, self.SYSTEM_ID)
-                recv_msg = self.tcpReceive(client_socket1)
-                
-                if recv_msg == "yes":
-                    break
-                elif recv_msg == "no":
-                    print("This device is not registered!")
-                    sys.exit(0)
+              
+            self.tcpSend(client_socket1, self.SYSTEM_ID)
+            recv_msg = self.tcpReceive(client_socket1)
+            
+            if recv_msg == "yes":
+                break
+            elif recv_msg == "no":
+                print("This device is not registered!")
+                sys.exit(0)
                 
             try:
                 # actuator:status 
@@ -52,11 +47,10 @@ class client_dust04_actuator(threading.Thread):
                 if actmsg == "yesAct":
                     msg_act = self.tcpReceive(client_socket1)
                     #print(msg_act)
-                    self.bt_s.send(msg_act)
-            
-                sleep(5)
+                    self.bt_socket.send(msg_act)            
             except KeyboardInterrupt:
                 print("Client stopped")
                 break
 
-        client_socket1.close()
+            client_socket1.close()
+            sleep(5)
