@@ -3,6 +3,7 @@ from select import *
 import sys
 import datetime
 import threading
+import json
 
 BUFFSIZE=1024
 
@@ -18,11 +19,11 @@ class client_sensor(threading.Thread):
     def format_data(self, msg):
         msg_list = msg.split(" ")
         
-        humi = "humidity:" + msg_list[0]
-        temp = "temperature:" + msg_list[1]
-        cds = "light:" + msg_list[2]
-        dust = "dust:" + msg_list[3]
-        led = "led:" + msg_list[4]
+        humi = msg_list[0]
+        temp = msg_list[1]
+        cds = msg_list[2]
+        dust = msg_list[3]
+        led = msg_list[4]
         
         result = humi + "!" + temp + "!" + cds + "!" + dust + "!" + led
         date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -41,46 +42,44 @@ class client_sensor(threading.Thread):
 
     def run(self):
         send_data=""
-        cnt=0
-        recv_list=[]
-        
 
         while True:
-            # 블루투스로 데이터 먼저 받고 -> 소켓 연결 -> 데이터 전송
-
-            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.connect((self.HOST, self.PORT_SENSOR))
-        
-            self.tcpSend(client_socket, self.SYSTEM_ID)
-            recv_msg = self.tcpReceive(client_socket)
-        
-            if recv_msg == "yes":
-                break
-            elif recv_msg == "no":
-                print(">> This device is not registered!")
-                sys.exit(0)
-                    
+            # 블루투스로 데이터 먼저 받고 -> 소켓 연결 -> 데이터 전송        
             try:
+                # 1. 블루투스로 데이터 전달 받기
                 recv_string = ""
-                arduino_num=""
-                recv_data=""
                 
                 while True:
-                    # 아두이노에서 json형태로 변환할 수 있을지 확인해 볼 것.
+                    # 아두이노에서 json형태로 변환할 수 있을지 확인해 볼 것. 
                     # 아두이노에서 system id 도 함께 보내줄 수 있도록
                     recv_msg = self.bt_socket.recv(BUFFSIZE).decode()
                     recv_string = recv_string + recv_msg
                     
-                    if recv_string[len(recv_string)-1] == "!":
+                    if recv_string[len(recv_string)-1] == "}":
                         break
                 
-                arduino_num = recv_string.split(":")[0]
-                recv_data = recv_string.split(":")[1].replace("!", "")
-
-                print(arduino_num)
-                print(recv_data)
+                jsondata = json.loads(recv_string)
+                #print(type(jsondata))
+                print(jsondata)
                 
-                send_data = self.format_data(recv_data)
+                self.SYSTEM_ID = jsondata["system_id"]
+                
+                # 2. 소켓 연결
+                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client_socket.connect((self.HOST, self.PORT_SENSOR))
+        
+                while True:
+                    self.tcpSend(client_socket, self.SYSTEM_ID)
+                    recv_msg = self.tcpReceive(client_socket)
+        
+                    if recv_msg == "yes":
+                        break
+                    elif recv_msg == "no":
+                        print(">> This device is not registered!")
+                        sys.exit(0)
+            
+                # 3. 데이터 전송
+                send_data = json.dumps(jsondata) # dict -> string
                 self.tcpSend(client_socket, send_data)
                 
             except KeyboardInterrupt:

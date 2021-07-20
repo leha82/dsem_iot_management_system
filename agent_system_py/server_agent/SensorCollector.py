@@ -1,6 +1,7 @@
 import threading
 import socket
 import DBManager
+import json
 
 BUFFSIZE = 4096
 
@@ -48,31 +49,37 @@ class SensorCollector (threading.Thread):
 
     def thread(self, client_socket, addr):
         try:
-            receive_id = self.receive(client_socket)
+            system_id = self.receive(client_socket)
             #print(receive_id)
 
-            table_name, item_id = self.dbm.get_item_list(receive_id)
+            table_name, item_id = self.dbm.get_item_list(system_id)
             #print("table name : ", table_name, ", item id : ", item_id)
 
             if table_name != None and item_id != None:
                 self.send(client_socket, 'yes')
-                print('Connected : ', receive_id, ' [item id : ',item_id,']')
+                print('Connected : ', system_id, ' [item id : ',item_id,']')
             else:
                 self.send(client_socket, 'no')
                 print('조회가 되질 않습니다')
                 return
-
+            
             receive_data = self.receive(client_socket)
-                
+
             if receive_data != "":
                 # 보내는 데이터가 humidity=50.0!temperature=20.1!... 이런식으로 올 수 있도록
-                #print("receive_data:"+receive_data)
-                input_data=receive_data.split('!')
+                receive_data = receive_data.replace("'", "\"")
+                jsondata = json.loads(receive_data)
+                #print(type(jsondata))
+
+                del jsondata["system_id"]
+                print("receive_data:", jsondata)
+
                 # input_data를 key, value 리스트로 각각 분리해서 만들 수 있도록 해야함
-                key_value_list = []
-                for i in range(1, len(input_data)):
-                    key_value_list.append(input_data[i].split(':'))
-                #print("key_value_list : ", key_value_list)
+                key_list = []
+                value_list = []
+                for key, value in jsondata.items():
+                    key_list.append(key)
+                    value_list.append(value)
 
                 # Specific metadata에 저장된 sensor 및 actuator를 받아와 list up 시킴
                 DB_column = []
@@ -86,12 +93,12 @@ class SensorCollector (threading.Thread):
                 #print("DB_column_list : ", DB_column_list)
 
                 input_list = []
-                for i in range(len(key_value_list)):
+                for i in range(len(key_list)):
                     for j in range(len(DB_column_list)):
-                        if (DB_column_list[j] == key_value_list[i][0]):
-                            input_list.append(key_value_list[i])
+                        if (DB_column_list[j] == key_list[i]):
+                            input_list.append([key_list[i], str(value_list[i])])
                             break
-                #print("input_list : ", input_list)
+                print("input_list : ", input_list)
 
                 # key, value 리스트를 dbm의 insert_data로 넣도록 함
                 self.dbm.insert_data(input_list, table_name)

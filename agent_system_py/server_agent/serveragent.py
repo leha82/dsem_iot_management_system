@@ -25,9 +25,9 @@ if __name__ == "__main__":
     dbm.DB_Con()
 
     sensor_collector = SensorCollector.SensorCollector(dbm, server_ip, port_sensor)
-    actuator_collector = ActuatorCollector.ActuatorCollector(dbm, server_ip, port_actuator)
+    #actuator_collector = ActuatorCollector.ActuatorCollector(dbm, server_ip, port_actuator)
     sensor_collector.start()
-    actuator_collector.start()
+    #actuator_collector.start()
 
-    actuator_collector.join()
+    #actuator_collector.join()
     sensor_collector.join()
