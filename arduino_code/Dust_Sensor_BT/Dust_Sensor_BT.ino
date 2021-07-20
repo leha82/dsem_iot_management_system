@@ -1,3 +1,5 @@
+#include <ArduinoJson.h>
+
 //1602 LCD 세팅
 #include <LiquidCrystal.h>               // LCD 라이브러리 포함
 LiquidCrystal lcd(13, 12, 5, 4, 3, 2);   // LCD 핀 설정
@@ -31,7 +33,7 @@ int LED_STATUS = 0;
 int cds = 0;
 
 // Device Number
-String arduino_num = "04";
+String system_id = "device0004";
 
 // actuator status
 String msg = "";  
@@ -67,14 +69,14 @@ void loop() {
   cds = analogRead(A2);
 
   // Serial Monitor
-  Serial.print(arduino_num);
-  Serial.print(":");
-  Serial.print(h); Serial.print(" ");
-  Serial.print(t); Serial.print(" ");
-  Serial.print(cds); Serial.print(" ");
-  Serial.print(dus); Serial.print(" ");
-  Serial.print(LED_STATUS); Serial.print("!");
-  Serial.println();
+//  Serial.print(system_id);
+//  Serial.print(":");
+//  Serial.print("humidity="); Serial.print(h); Serial.print(" ");
+//  Serial.print("temperature="); Serial.print(t); Serial.print(" ");
+//  Serial.print("light="); Serial.print(cds); Serial.print(" ");
+//  Serial.print("dust="); Serial.print(dus); Serial.print(" ");
+//  Serial.print("led="); Serial.print(LED_STATUS); Serial.print("!");
+//  Serial.println();
 
   //1602 LCD 모듈 코드
   lcd.clear();
@@ -110,16 +112,35 @@ void loop() {
 //    digitalWrite(10, LOW); delay(500);
 //    digitalWrite(10, HIGH);  
 //  }
+
+  // JSON
+  String jsondata = "";
+
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  root["system_id"] = system_id;
+
+  JsonArray* Sensor = &root.createNestedArray("Sensor");
+  JsonObject& Sensor_0 = Sensor.createObject();
+  Sensor_0["humidity"] = h;
+  Sensor_0["temperature"] = t;
+  Sensor_0["light"] = cds;
+  Sensor_0["dust"] = dus;
+  Sensor_0["led"] = LED_STATUS;
+
+  root.printTo(jsondata);  // String으로 변환
+  Serial.println(jsondata);
     
   // BluetoothSerial print
-  BTSerial.print(arduino_num);
-  BTSerial.print(":");
-  BTSerial.print(h); BTSerial.print(" ");
-  BTSerial.print(t); BTSerial.print(" ");
-  BTSerial.print(cds); BTSerial.print(" ");
-  BTSerial.print(dus); BTSerial.print(" ");
-  BTSerial.print(LED_STATUS); BTSerial.print("!");
+//  BTSerial.print(system_id);
+//  BTSerial.print(":");
+//  BTSerial.print("humidity="); BTSerial.print(h); BTSerial.print(" ");
+//  BTSerial.print("temperature=");BTSerial.print(t); BTSerial.print(" ");
+//  BTSerial.print("light=");BTSerial.print(cds); BTSerial.print(" ");
+//  BTSerial.print("dust=");BTSerial.print(dus); BTSerial.print(" ");
+//  BTSerial.print("led=");BTSerial.print(LED_STATUS); BTSerial.print("!");
 
+  BTSerial.print(jsondata);
   delay(5000);
 
   //BluetoothSerial Read
