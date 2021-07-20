@@ -1,6 +1,6 @@
 #include <ArduinoJson.h>
 
-//1602 LCD 세팅
+//1602 LCD Setting
 #include <LiquidCrystal.h>               // LCD 라이브러리 포함
 LiquidCrystal lcd(13, 12, 5, 4, 3, 2);   // LCD 핀 설정
 
@@ -13,17 +13,14 @@ SoftwareSerial BTSerial(8,9); // Tx, Rx
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
-//먼지센서 세팅
+// Dust Sensor Setting
 int DUST_LED = 11;
-int DUST = 0;
+int DUST_PIN = 0;
 int samplingTime = 280;
 int deltaTime = 40;
 int sleepTime = 9680;
-float dustval = 0;
-float voltage = 0;
-float dustug = 0;
-float dus = 0;
-float a = 0;
+float dust = 0;
+float p_dust = 0;
 
 // LED light setting
 int LED_LIGHT = 10;
@@ -35,46 +32,45 @@ int cds = 0;
 // Device Number
 String system_id = "device0004";
 
-// actuator status
-String msg = "";  
-String actuator = "";
-int value = 0;
-
 void setup() {
+  // initialize communication 
   Serial.begin(9600);        // 시리얼 통신 시작
-  lcd.begin(16, 2);           // 16x2 LCD 선언
-  pinMode(DUST_LED, OUTPUT);  // 먼지센서 LED 핀 설정
   BTSerial.begin(9600); // 블루투스 시리얼 개방
 
+  // initialize sensor
+
+  // initialize actuator
+  pinMode(DUST_LED, OUTPUT);  // 먼지센서 LED 핀 설정
   pinMode(LED_LIGHT, OUTPUT);
+  lcd.begin(16, 2);           // 16x2 LCD 선언
 }
 
 void loop() {
-  // DustSensor code
+  // read DustSensor
   digitalWrite(DUST_LED, LOW); // 적외선 LED ON
   delayMicroseconds(samplingTime);
-  dustval = analogRead(DUST); //먼지센서 값 읽기
+  float dustval = analogRead(DUST_PIN); //먼지센서 값 읽기
   delayMicroseconds(deltaTime);
   digitalWrite(DUST_LED, HIGH); // 적외선 LED OFF
   delayMicroseconds(sleepTime);
-  voltage = dustval * (5.0 / 1024.0);  // 전압 구하기, 전압 단위 : V
-  dustug = 0.17 * voltage;      // ug 단위 변환
-  dus = dustug * 1000;
+  float voltage = dustval * (5.0 / 1024.0);  // 전압 구하기, 전압 단위 : V
+  float dustug = 0.17 * voltage;      // ug 단위 변환
+  dust = dustug * 1000;
 
-  // dht11 code
-  int h = dht.readHumidity(); 
-  int t = dht.readTemperature();
+  // read dht11
+  int humi = dht.readHumidity(); 
+  int temp = dht.readTemperature();
 
-  // cds code
+  // read cds
   cds = analogRead(A2);
 
   // Serial Monitor
 //  Serial.print(system_id);
 //  Serial.print(":");
-//  Serial.print("humidity="); Serial.print(h); Serial.print(" ");
-//  Serial.print("temperature="); Serial.print(t); Serial.print(" ");
+//  Serial.print("humidity="); Serial.print(humi); Serial.print(" ");
+//  Serial.print("temperature="); Serial.print(temp); Serial.print(" ");
 //  Serial.print("light="); Serial.print(cds); Serial.print(" ");
-//  Serial.print("dust="); Serial.print(dus); Serial.print(" ");
+//  Serial.print("dust="); Serial.print(p_dust); Serial.print(" ");
 //  Serial.print("led="); Serial.print(LED_STATUS); Serial.print("!");
 //  Serial.println();
 
@@ -83,32 +79,32 @@ void loop() {
   analogWrite(6, 120);
   lcd.setCursor(0, 0);
   lcd.print("H: ");
-  lcd.print(h);
+  lcd.print(humi);
   lcd.print(" %  ");
   lcd.print("T: ");
-  lcd.print(t);
+  lcd.print(temp);
   lcd.print(" C");
   lcd.setCursor(0, 1);
   lcd.print("Dust: ");
-  if (dus > 0) {
-    a = dus;
-    lcd.print(a);
+  if (dust > 0) {
+    p_dust = dust;
+    lcd.print(p_dust);
   }
   else {
-    lcd.print(a);
+    lcd.print(p_dust);
   }
   lcd.print("ug");
 
   // LED Light Change
   digitalWrite(LED_LIGHT, LED_STATUS);
-//  if (a < 35) {   // 좋음
+//  if (p_dust < 35) {   // 좋음
 //    digitalWrite(10, HIGH);
 //  }
-//  if (a > 35 & a < 75) {  // 나쁨
+//  if (p_dust > 35 & p_dust < 75) {  // 나쁨
 //    digitalWrite(10, LOW); delay(1000);
 //    digitalWrite(10, HIGH);
 //  }
-//  if (a > 75) {       // 매우 나쁨
+//  if (p_dust > 75) {       // 매우 나쁨
 //    digitalWrite(10, LOW); delay(500);
 //    digitalWrite(10, HIGH);  
 //  }
@@ -119,10 +115,10 @@ void loop() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
   root["system_id"] = system_id;
-  root["humidity"] = h;
-  root["temperature"] = t;
+  root["humidity"] = humi;
+  root["temperature"] = temp;
   root["light"] = cds;
-  root["dust"] = dus;
+  root["dust"] = p_dust;
   root["led"] = LED_STATUS;
 
   root.printTo(jsondata);  // String으로 변환
@@ -131,28 +127,30 @@ void loop() {
   // BluetoothSerial print
 //  BTSerial.print(system_id);
 //  BTSerial.print(":");
-//  BTSerial.print("humidity="); BTSerial.print(h); BTSerial.print(" ");
-//  BTSerial.print("temperature=");BTSerial.print(t); BTSerial.print(" ");
+//  BTSerial.print("humidity="); BTSerial.print(humi); BTSerial.print(" ");
+//  BTSerial.print("temperature=");BTSerial.print(temp); BTSerial.print(" ");
 //  BTSerial.print("light=");BTSerial.print(cds); BTSerial.print(" ");
-//  BTSerial.print("dust=");BTSerial.print(dus); BTSerial.print(" ");
+//  BTSerial.print("dust=");BTSerial.print(p_dust); BTSerial.print(" ");
 //  BTSerial.print("led=");BTSerial.print(LED_STATUS); BTSerial.print("!");
 
   BTSerial.print(jsondata);
-  delay(5000);
 
-  //BluetoothSerial Read
+  // BluetoothSerial Read
+  // json 형태로 받기
   while (BTSerial.available() > 0) {
     String recv = BTSerial.readString();
     //Serial.println(recv);    // ex) led:1
 
     int index1 = recv.indexOf(':');
     int index2 = recv.length();
-    actuator = recv.substring(0, index1);  // led
-    value = recv.substring(index1+1, index2).toInt();  // 1
+    String actuator = recv.substring(0, index1);  // led
+    String value = recv.substring(index1+1, index2);  // 1
     //Serial.println(value);
 
     if (actuator == "led") {
-      LED_STATUS = value;
+      LED_STATUS = value.toInt();
     }
   }
+
+  delay(5000);
 }

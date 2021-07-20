@@ -21,7 +21,7 @@ class ActuatorCollector(threading.Thread):
     def run(self):
         print('run Actuator Collector')
         server_socket2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket2.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket2.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # 수정 : SOL_SOCKET, SO_REuSEADDR 확인
         server_socket2.bind((self.HOST, self.PORT))
         server_socket2.listen()
 

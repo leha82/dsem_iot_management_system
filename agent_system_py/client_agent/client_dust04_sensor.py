@@ -55,7 +55,7 @@ class client_sensor(threading.Thread):
                     recv_msg = self.bt_socket.recv(BUFFSIZE).decode()
                     recv_string = recv_string + recv_msg
                     
-                    if recv_string[len(recv_string)-1] == "}":
+                    if recv_string[len(recv_string)-1] == "}":  # 수정 : 특수문자(종료문자)붙여서 보내기 
                         break
                 
                 jsondata = json.loads(recv_string)

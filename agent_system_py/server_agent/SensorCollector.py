@@ -33,7 +33,7 @@ class SensorCollector (threading.Thread):
                 print('Connected by', addr)
 
                 sensor_thread = threading.Thread(target=self.thread, args=(client_socket, addr,))
-                sensor_thread.run()
+                sensor_thread.run()  # 수정 : start() 실험
                 
         except KeyboardInterrupt:
             print('동작을 중지하였습니다.')
@@ -87,6 +87,7 @@ class SensorCollector (threading.Thread):
                 #print("DB_column : " , DB_column)
 
                 # DB_column의 리스트와 key 리스트를 비교하여 key 리스트의 값이 DB_column에 존재하지 않으면 해당 key는 db로 넣지 못함
+                # 수정 : 91~101 코드 정리
                 DB_column_list = []
                 for i in range(len(DB_column)):
                     DB_column_list.append(DB_column[i][0])
@@ -96,7 +97,7 @@ class SensorCollector (threading.Thread):
                 for i in range(len(key_list)):
                     for j in range(len(DB_column_list)):
                         if (DB_column_list[j] == key_list[i]):
-                            input_list.append([key_list[i], str(value_list[i])])
+                            input_list.append([key_list[i], str(value_list[i])])  # 수정 : java contain같은 함수 있는지 확인
                             break
                 print("input_list : ", input_list)
 

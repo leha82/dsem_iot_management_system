@@ -30,4 +30,4 @@ if __name__ == "__main__":
     #actuator_collector.start()
 
     #actuator_collector.join()
-    sensor_collector.join()
+    sensor_collector.join()  # 수정 : join()? 확인
