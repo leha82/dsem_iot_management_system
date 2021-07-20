@@ -119,14 +119,11 @@ void loop() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
   root["system_id"] = system_id;
-
-  JsonArray* Sensor = &root.createNestedArray("Sensor");
-  JsonObject& Sensor_0 = Sensor.createObject();
-  Sensor_0["humidity"] = h;
-  Sensor_0["temperature"] = t;
-  Sensor_0["light"] = cds;
-  Sensor_0["dust"] = dus;
-  Sensor_0["led"] = LED_STATUS;
+  root["humidity"] = h;
+  root["temperature"] = t;
+  root["light"] = cds;
+  root["dust"] = dus;
+  root["led"] = LED_STATUS;
 
   root.printTo(jsondata);  // String으로 변환
   Serial.println(jsondata);
