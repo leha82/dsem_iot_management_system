@@ -59,10 +59,10 @@ class ActuatorCollector(threading.Thread):
         print("AC >> table name : ", table_name, ", item id : ", item_id)
 
         if table_name != None and item_id != None:
-            self.send(client_socket, 'yes')
-            # print('AC >> Connected : ', receive_id, ' [item id : ',item_id,']')
+            # self.send(client_socket, 'reg')
+            print('AC >> Device is registered.')
         else:
-            self.send(client_socket, 'no')
+            self.send(client_socket, 'notreg') # notreg : The device is not registered in DB
             print('AC >> cannot find the table : ', receive_id)
             return
 
@@ -70,7 +70,7 @@ class ActuatorCollector(threading.Thread):
         num2 = self.dbm.get_data_cnt(table_name)
 
         if (num==1 and num2>0):
-            self.send(client_socket, 'yesAct')
+            # self.send(client_socket, '')
             
             actlist = []
             actlist = self.dbm.get_distinct_actlist(table_name)
@@ -83,11 +83,11 @@ class ActuatorCollector(threading.Thread):
                     status=rs[1]
                     msg = actuator + ":" + status
                     self.send(client_socket, msg)
-                    print(msg)
+                    # print("AA >> ", msg)
 
                 self.dbm.delete_actuator_data(i, table_name)
         else:
-            self.send(client_socket, 'noAct')
+            self.send(client_socket, 'noevt') # noevt : there is no event of the actutator
         client_socket.close()
 
                 

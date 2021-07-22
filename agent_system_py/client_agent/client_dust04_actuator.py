@@ -29,26 +29,22 @@ class client_actuator(threading.Thread):
     def run(self):  
             
         while True:
-            print("AA >> try to connect actuator agent of server...")
-            client_socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket1.connect((self.HOST, self.PORT_ACTUATOR))
-              
-            self.tcpSend(client_socket1, self.SYSTEM_ID)
-            recv_msg = self.tcpReceive(client_socket1)
-            
-            if recv_msg == "yes":
-                break
-            elif recv_msg == "no":
-                print("AA >> This device is not registered!")
-                sys.exit(0)
-                
             try:
-                # actuator:status 
-                actmsg = self.tcpReceive(client_socket1)
-                if actmsg == "yesAct":
-                    msg_act = self.tcpReceive(client_socket1)
-                    #print(msg_act)
-                    self.bt_socket.send(msg_act)            
+                print("AA >> try to connect actuator agent of server...")
+                client_socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client_socket1.connect((self.HOST, self.PORT_ACTUATOR))
+
+                self.tcpSend(client_socket1, self.SYSTEM_ID)
+                recv_msg = self.tcpReceive(client_socket1)
+
+                if recv_msg == "notreg":
+                    print("AA >> This device is not registered!")
+                elif recv_msg == "noevt":
+                    print("AA >> There is no event for all actutators")
+                else :
+                    # received message >> actuator:status
+                    self.bt_socket.send(recv_msg)     
+
             except KeyboardInterrupt:
                 print("AA >> Client stopped")
                 break
