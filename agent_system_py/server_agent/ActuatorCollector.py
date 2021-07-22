@@ -53,14 +53,14 @@ class ActuatorCollector(threading.Thread):
 
     def thread(self, client_socket, addr):
         receive_id = self.receive(client_socket)
-        print(receive_id)
+        print("AC >> ", receive_id)
 
         table_name, item_id = self.dbm.get_item_list(receive_id)
         print("AC >> table name : ", table_name, ", item id : ", item_id)
 
         if table_name != None and item_id != None:
             self.send(client_socket, 'yes')
-            print('AC >> Connected : ', receive_id, ' [item id : ',item_id,']')
+            # print('AC >> Connected : ', receive_id, ' [item id : ',item_id,']')
         else:
             self.send(client_socket, 'no')
             print('AC >> cannot find the table : ', receive_id)
