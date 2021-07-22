@@ -85,6 +85,11 @@ class client_sensor(threading.Thread):
             except KeyboardInterrupt:
                 print("Client stopped")
                 break
+            except :
+                print("TCP protocol error")
+            
+            print("connection again")
+
 
         client_socket.close()
    
