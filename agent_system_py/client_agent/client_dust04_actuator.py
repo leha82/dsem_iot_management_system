@@ -19,16 +19,17 @@ class client_actuator(threading.Thread):
             
     def tcpSend(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
-        #print("[actuator] tcp send : ", message)
+        print("AA >> tcp send : ", message)
 
     def tcpReceive(self, client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        #print("[artuator] tcp receive : ", recv_msg)
+        print("AA >> tcp receive : ", recv_msg)
         return recv_msg
     
     def run(self):  
             
         while True:
+            print("AA >> try to connect actuator agent of server...")
             client_socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket1.connect((self.HOST, self.PORT_ACTUATOR))
               
@@ -38,7 +39,7 @@ class client_actuator(threading.Thread):
             if recv_msg == "yes":
                 break
             elif recv_msg == "no":
-                print("This device is not registered!")
+                print("AA >> This device is not registered!")
                 sys.exit(0)
                 
             try:
@@ -49,8 +50,10 @@ class client_actuator(threading.Thread):
                     #print(msg_act)
                     self.bt_socket.send(msg_act)            
             except KeyboardInterrupt:
-                print("Client stopped")
+                print("AA >> Client stopped")
                 break
+            except :
+                print("AA >> TCP connection error")
 
             client_socket1.close()
             sleep(5)

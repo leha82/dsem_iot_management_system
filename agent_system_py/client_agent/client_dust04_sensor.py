@@ -33,11 +33,11 @@ class client_sensor(threading.Thread):
 
     def tcpSend(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
-        #print("[sensor] tcp send : ", message)
+        #print("SA >> tcp send : ", message)
 
     def tcpReceive(self, client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        #print("[sensor] tcp receive : ", recv_msg)
+        #print("SA >> tcp receive : ", recv_msg)
         return recv_msg
 
     def run(self):
@@ -65,6 +65,7 @@ class client_sensor(threading.Thread):
                 self.SYSTEM_ID = jsondata["system_id"]
                 
                 # 2. 소켓 연결
+                print("SA >> try to connect sensor agent of server...")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_SENSOR))
         
@@ -75,7 +76,7 @@ class client_sensor(threading.Thread):
                     if recv_msg == "yes":
                         break
                     elif recv_msg == "no":
-                        print(">> This device is not registered!")
+                        print("SA >> This device is not registered!")
                         sys.exit(0)
             
                 # 3. 데이터 전송
@@ -83,13 +84,11 @@ class client_sensor(threading.Thread):
                 self.tcpSend(client_socket, send_data)
                 
             except KeyboardInterrupt:
-                print("Client stopped")
+                print("SA >> Client stopped")
                 break
             except :
-                print("TCP protocol error")
-            
-            print("connection again")
-
+                print("SA >> TCP protocol error")
 
         client_socket.close()
+        print("SA >> close client socket")
    
