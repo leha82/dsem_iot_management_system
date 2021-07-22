@@ -29,12 +29,12 @@ if __name__ == "__main__":
     bt_socket.connect((BT_ADDR,BT_PORT))
     
     sensor = cs.client_sensor(bt_socket, HOST, SYSTEM_ID, PORT_SENSOR)
-    #actuator = ca.client_actuator(bt_socket, HOST, SYSTEM_ID, PORT_ACTUATOR)
+    actuator = ca.client_actuator(bt_socket, HOST, SYSTEM_ID, PORT_ACTUATOR)
     
     sensor.start()
-    #actuator.start()
+    actuator.start()
     
     sensor.join()
-    #actuator.join()
+    actuator.join()
     
     bt_socket.close()
