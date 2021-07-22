@@ -33,7 +33,9 @@ class SensorCollector (threading.Thread):
                 print('Connected by', addr)
 
                 sensor_thread = threading.Thread(target=self.thread, args=(client_socket, addr,))
-                sensor_thread.run()  # 수정 : start() 실험
+                sensor_thread.start()  # 수정 : start() 실험
+                # run()은 병행 처리를 못함 -> 이전의 스레드가 종료되어야 다른 스레드 실행됨
+                # start()는 병행 처리 가능 (start를 사용해야함)
                 
         except KeyboardInterrupt:
             print('동작을 중지하였습니다.')
@@ -90,15 +92,13 @@ class SensorCollector (threading.Thread):
                 # 수정 : 91~101 코드 정리
                 DB_column_list = []
                 for i in range(len(DB_column)):
-                    DB_column_list.append(DB_column[i][0])
+                    DB_column_list.append(DB_column[i][0])  # (('humidity',), ('temperature', ), ...) 이런식으로 되어 있음
                 #print("DB_column_list : ", DB_column_list)
 
                 input_list = []
                 for i in range(len(key_list)):
-                    for j in range(len(DB_column_list)):
-                        if (DB_column_list[j] == key_list[i]):
-                            input_list.append([key_list[i], str(value_list[i])])  # 수정 : java contain같은 함수 있는지 확인
-                            break
+                    if key_list[i] in DB_column_list:   # in, not in : Java의 append함수
+                        input_list.append([key_list[i], str(value_list[i])])
                 print("input_list : ", input_list)
 
                 # key, value 리스트를 dbm의 insert_data로 넣도록 함

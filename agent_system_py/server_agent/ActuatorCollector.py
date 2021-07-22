@@ -33,7 +33,7 @@ class ActuatorCollector(threading.Thread):
                 print('Connected by', addr)
 
                 actuator_thread = threading.Thread(target=self.thread, args=(client_socket, addr,))
-                actuator_thread.run()  # run vs start
+                actuator_thread.start() 
                 
         except KeyboardInterrupt:
             print('동작을 중지하였습니다.')
