@@ -103,7 +103,7 @@ class SensorCollector (threading.Thread):
 
                 # key, value 리스트를 dbm의 insert_data로 넣도록 함
                 self.dbm.insert_data(input_list, table_name)
-            client_socket.close()
+                client_socket.close()
             
         except Exception as e :
             self.send(client_socket, 'no')

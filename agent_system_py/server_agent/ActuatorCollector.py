@@ -5,6 +5,9 @@ import DBManager
 
 BUFFSIZE = 4096
 
+# ConnectionRefusedError: [WinError 10061] 대상 컴퓨터에서 연결을 거부했으므로 연결하지 못했습니다.
+# 해결방안? 서버-클라이언트 통신 시험용으로 idel 사용 시, 서버와 클라이언트 프로그램을 각각의 idel.exe에서 실행할 것
+
 class ActuatorCollector(threading.Thread):
     def __init__(self, dbmanager = DBManager.DBManager(), server_host='localhost', actuator_manager_port=11202):
         threading.Thread.__init__(self)
@@ -22,6 +25,7 @@ class ActuatorCollector(threading.Thread):
         print('run Actuator Collector')
         server_socket2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket2.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # 수정 : SOL_SOCKET, SO_REuSEADDR 확인
+        # 이미 사용된 주소를 재사용(bind) 하도록 한다.
         server_socket2.bind((self.HOST, self.PORT))
         server_socket2.listen()
 
