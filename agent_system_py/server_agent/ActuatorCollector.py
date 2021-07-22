@@ -22,7 +22,7 @@ class ActuatorCollector(threading.Thread):
         self.PORT = actuator_manager_port 
 
     def run(self):
-        print('run Actuator Collector')
+        print('AC >> run Actuator Collector')
         server_socket2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket2.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # 수정 : SOL_SOCKET, SO_REuSEADDR 확인
         # 이미 사용된 주소를 재사용(bind) 하도록 한다.
@@ -31,24 +31,24 @@ class ActuatorCollector(threading.Thread):
 
         try:
             while True:
-                print('Actuator Manager waiting...')
+                print('AC >> Actuator Manager waiting...')
 
                 client_socket, addr = server_socket2.accept()
-                print('Connected by', addr)
+                print('AC >> Connected by', addr)
 
                 actuator_thread = threading.Thread(target=self.thread, args=(client_socket, addr,))
                 actuator_thread.start() 
                 
         except KeyboardInterrupt:
-            print('동작을 중지하였습니다.')
+            print('AC >> Actuator Collector is stopped.')
 
     def send(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
-        print("Actuator collector send : ", message)
+        print("AC >> send : ", message)
 
     def receive(self, client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        print("Actuator collector receive : ", recv_msg)
+        print("AC >> receive : ", recv_msg)
         return recv_msg
 
     def thread(self, client_socket, addr):
@@ -56,14 +56,14 @@ class ActuatorCollector(threading.Thread):
         print(receive_id)
 
         table_name, item_id = self.dbm.get_item_list(receive_id)
-        print("table name : ", table_name, ", item id : ", item_id)
+        print("AC >> table name : ", table_name, ", item id : ", item_id)
 
         if table_name != None and item_id != None:
             self.send(client_socket, 'yes')
-            print('Connected : ', receive_id, ' [item id : ',item_id,']')
+            print('AC >> Connected : ', receive_id, ' [item id : ',item_id,']')
         else:
             self.send(client_socket, 'no')
-            print('조회가 되질 않습니다')
+            print('AC >> cannot find the table : ', receive_id)
             return
 
         num = self.dbm.get_information_cnt(table_name)

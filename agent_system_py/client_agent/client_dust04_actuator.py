@@ -19,11 +19,11 @@ class client_actuator(threading.Thread):
             
     def tcpSend(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
-        print("AA >> tcp send : ", message)
+        print("AA >> send : ", message)
 
     def tcpReceive(self, client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        print("AA >> tcp receive : ", recv_msg)
+        print("AA >> receive : ", recv_msg)
         return recv_msg
     
     def run(self):  
