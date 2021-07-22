@@ -1,0 +1,8 @@
+{
+    "SERVER_IP": "input server ip",
+    "SERVER_PORT_SENSOR": 11201,
+    "SERVER_PORT_ACTUATOR": 11202,
+    "BT_ADDR" : "input bluetooth mac address of arduino",
+    "BT_PORT" : 1,
+    "SYSTEM_ID" : "input device id(eg. device0004)"
+}

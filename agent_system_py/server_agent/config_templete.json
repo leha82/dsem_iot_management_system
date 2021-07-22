@@ -1,0 +1,12 @@
+{
+    "SERVER_IP": "input server ip address",
+    "PORT_Sensor": 11201, 
+    "PORT_Actuator": 11202, 
+    "DB_Host": "input database address (ip address)", 
+    "DB_User": "input database user id", 
+    "DB_Password": "input database password id", 
+    "DBName_Registry": "DeviceRegistry", 
+    "DBName_Measurement":"DeviceMeasurement", 
+    "TblName_SpecificMetadata": "specific_metadata",
+    "TblName_DeviceList": "device_list"
+}
