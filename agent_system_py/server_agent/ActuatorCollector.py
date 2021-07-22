@@ -68,6 +68,7 @@ class ActuatorCollector(threading.Thread):
 
         num = self.dbm.get_information_cnt(table_name)
         num2 = self.dbm.get_data_cnt(table_name)
+        print("table num : ", num, " | event num : ", num2)
 
         if (num==1 and num2>0):
             # self.send(client_socket, '')

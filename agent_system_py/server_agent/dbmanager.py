@@ -66,6 +66,7 @@ class DBManager:
         self.curs.execute(sql)
         rs = self.curs.fetchone()
         num = rs[0]
+        print("dbm >> ", num)
         return num
 
     # Actuator 제어 요청(중복 없이) 가져오기
