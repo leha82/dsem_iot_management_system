@@ -83,7 +83,7 @@ class ActuatorCollector(threading.Thread):
                     status=rs[1]
                     msg = actuator + ":" + status
                     self.send(client_socket, msg)
-                    # print("AA >> ", msg)
+                    # print("AC >> ", msg)
 
                 self.dbm.delete_actuator_data(i, table_name)
         else:
