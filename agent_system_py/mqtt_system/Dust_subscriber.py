@@ -16,7 +16,7 @@ def on_message(client, userdata, msg):
     print(str(msg.payload.decode("utf-8")))
 
 while True:
-# 새로운 클라이언트 생성
+    # 새로운 클라이언트 생성
     client = mqtt.Client()
     # 콜백 함수 설정 on_connect(브로커에 접속), on_disconnect(브로커에 접속중료), on_subscribe(topic 구독),
     # on_message(발행된 메세지가 들어왔을 때)

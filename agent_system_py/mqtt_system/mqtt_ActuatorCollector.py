@@ -1,7 +1,7 @@
 import threading
-import socket
 import time
-import DBManager
+import mqtt_DBManager
+import paho.mqtt.client as mqtt
 
 BUFFSIZE = 4096
 
@@ -9,47 +9,55 @@ BUFFSIZE = 4096
 # 해결방안? 서버-클라이언트 통신 시험용으로 idel 사용 시, 서버와 클라이언트 프로그램을 각각의 idel.exe에서 실행할 것
 
 class ActuatorCollector(threading.Thread):
-    def __init__(self, dbmanager = DBManager.DBManager(), server_host='localhost', actuator_manager_port=11202):
+    def __init__(self, dbmanager = mqtt_DBManager.DBManager(), server_host='localhost', actuator_manager_port=11202, mqtt_broker_host='203.234.62.117'):
         threading.Thread.__init__(self)
 
         self.dbm = dbmanager
-        if server_host == 'localhost':
-            self.HOST = socket.gethostbyname(socket.getfqdn()) # 서버 ip주소 자신의 아이피로 자동 할당
-            print("set HOST:"+self.HOST)
-        else:
-            self.HOST = server_host
-            print(self.HOST)
+        self.system_id = "device0000"
+        self.mqtt_broker_host = mqtt_broker_host
+
         self.PORT = actuator_manager_port 
+
+    # MQTT function
+    def on_connect(self, client, userdata, flags, rc):
+        # 연결이 성공적으로 된다면 완료 메세지 출력
+        if rc == 0:
+            print("completely connected")
+        else:
+            print("Bad connection Returned code=", rc)
+    
+    # 연결이 끊기면 출력
+    def on_disconnect(self, client, userdata, flags, rc=0):
+        print(str(rc))
+    
+    def on_publish(self, client, userdata, mid):
+        print("In on_pub callback mid= ", mid)
 
     def run(self):
         print('AC >> run Actuator Collector')
-        server_socket2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket2.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # 수정 : SOL_SOCKET, SO_REuSEADDR 확인
-        # 이미 사용된 주소를 재사용(bind) 하도록 한다.
-        server_socket2.bind((self.HOST, self.PORT))
-        server_socket2.listen()
 
-        try:
-            while True:
-                print('AC >> Actuator Manager waiting...')
+        # 새로운 클라이언트 생성
+        client = mqtt.Client()
+        # 콜백 함수 설정 on_connect(브로커에 접속), on_disconnect(브로커에 접속중료), on_publish(메세지 발행)
+        client.on_connect = self.on_connect
+        client.on_disconnect = self.on_disconnect
+        client.on_publish = self.on_publish
 
-                client_socket, addr = server_socket2.accept()
-                print('AC >> Connected by', addr)
+        while True:
+            print('AC >> Actuator Manager waiting...')
+            
+            # 로컬 아닌, 원격 mqtt broker에 연결
+            # address : broker.hivemq.com
+            # port: 1883 에 연결
+            # 라즈베리파이 자신에게 MQTT 브로커가 설치되어 있으므로 자신의 IP를 넣어줌
+            client.connect(self.mqtt_broker_host, 1883)
+            client.loop_start()
+            # 'test/hello' 라는 topic 으로 메세지 발행
+            client.publish('test/sensor', send_data, 1)
+            client.loop_stop()
+            # 연결 종료
+            client.disconnect()
 
-                actuator_thread = threading.Thread(target=self.thread, args=(client_socket, addr,))
-                actuator_thread.start() 
-                
-        except KeyboardInterrupt:
-            print('AC >> Actuator Collector is stopped.')
-
-    def send(self, client_socket, message):
-        client_socket.send(bytes(message,"UTF-8"))
-        print("AC >> send : ", message)
-
-    def receive(self, client_socket):
-        recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        print("AC >> receive : ", recv_msg)
-        return recv_msg
 
     def thread(self, client_socket, addr):
         receive_id = "device0000"
@@ -90,6 +98,5 @@ class ActuatorCollector(threading.Thread):
                 self.dbm.delete_actuator_data(i, table_name)
         else:
             self.send(client_socket, 'noevt') # noevt : there is no event of the actutator
-            client_socket.close()
 
                 

@@ -89,6 +89,6 @@ class client_sensor(threading.Thread):
             except :
                 print("SA >> TCP protocol error")
 
-        client_socket.close()
+            client_socket.close()
         print("SA >> close client socket")
    
