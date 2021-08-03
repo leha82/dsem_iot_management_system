@@ -1,6 +1,7 @@
 import threading
 import mqtt_DBManager
 import json
+import socket
 import paho.mqtt.client as mqtt
 
 BUFFSIZE = 4096
@@ -73,7 +74,7 @@ class SensorCollector (threading.Thread):
 
             # key, value 리스트를 dbm의 insert_data로 넣도록 함
             self.dbm.insert_data(input_list, table_name)
-        
+
 
     def run(self):
         print('run Sensor Collector')
@@ -87,10 +88,13 @@ class SensorCollector (threading.Thread):
             client.on_disconnect = self.on_disconnect
             client.on_subscribe = self.on_subscribe
             client.on_message = self.on_message
-            # 로컬 아닌, 원격 mqtt broker에 연결
-            # address : broker.hivemq.com
-            # port: 1883 에 연결
+
             client.connect(self.mqtt_broker_host, 1883)
-            # test/hello 라는 topic 구독
-            client.subscribe('test/sensor', 1)
+            client.subscribe('data/sensor', 1)
             client.loop_forever()
+
+            #client.disconnect()
+            # client.loop_forever() 를 사용하는 경우, 메소드는 현재 스레드를 사용하여 클라이언트의 네트워크
+            # 스레드를 실행하고 해당 호출에서 해당 블록을 실행
+            # client.loop_start() 를 사용하는 경우 그런 다음 백그라운드에서 새 스레드를 시작하여 네트워크 루프
+            # 와 모든 콜백을 실행

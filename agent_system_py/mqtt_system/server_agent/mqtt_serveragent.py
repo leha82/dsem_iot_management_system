@@ -6,7 +6,7 @@ import mqtt_ActuatorCollector
 
 
 if __name__ == "__main__":
-    file_path = './agent_system_py/mqtt_system/config.json'
+    file_path = './agent_system_py/mqtt_system/server_agent/config.json'
     with open(file_path, "r") as fj:
         fd = json.load(fj)
         server_ip = fd['SERVER_IP']
@@ -26,11 +26,11 @@ if __name__ == "__main__":
     dbm.DB_Con()
 
     sensor_collector = mqtt_SensorCollector.SensorCollector(dbm, server_ip, port_sensor, mqtt_broker_host)
-    #actuator_collector = mqtt_ActuatorCollector.ActuatorCollector(dbm, server_ip, port_actuator, mqtt_broker_host)
+    actuator_collector = mqtt_ActuatorCollector.ActuatorCollector(dbm, server_ip, port_actuator, mqtt_broker_host)
     
     sensor_collector.start()
-    #actuator_collector.start()
+    actuator_collector.start()
 
-    #actuator_collector.join()
+    actuator_collector.join()
     sensor_collector.join()  # 수정 : join()? 확인
     # join() : 해당 스레드가 종료되기까지 기다렸다가 다음으로 넘어감(스레드는 메인이 종료되어도 백그라운드에서 돌아감)

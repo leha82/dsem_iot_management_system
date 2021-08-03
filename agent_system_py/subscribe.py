@@ -29,5 +29,5 @@ while True:
     # port: 1883 에 연결
     client.connect('203.234.62.117', 1883)
     # test/hello 라는 topic 구독
-    client.subscribe('test/sensor', 1)
+    client.subscribe('test/hello', 1)
     client.loop_forever()

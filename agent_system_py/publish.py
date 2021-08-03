@@ -25,7 +25,7 @@ client.on_publish = on_publish
 # address : broker.hivemq.com
 # port: 1883 에 연결
 # 라즈베리파이 자신에게 MQTT 브로커가 설치되어 있으므로 자신의 IP를 넣어
-client.connect('127.0.0.1', 1883)
+client.connect('203.234.62.117', 1883)
 client.loop_start()
 # 'test/hello' 라는 topic 으로 메세지 발행
 client.publish('test/hello', "Hello", 1)

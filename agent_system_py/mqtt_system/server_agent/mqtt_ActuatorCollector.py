@@ -1,7 +1,8 @@
 import threading
-import time
 import mqtt_DBManager
+import mqtt_SensorCollector
 import paho.mqtt.client as mqtt
+import time
 
 BUFFSIZE = 4096
 
@@ -13,7 +14,7 @@ class ActuatorCollector(threading.Thread):
         threading.Thread.__init__(self)
 
         self.dbm = dbmanager
-        self.system_id = "device0000"
+        self.system_id = "device0004"
         self.mqtt_broker_host = mqtt_broker_host
 
         self.PORT = actuator_manager_port 
@@ -43,45 +44,15 @@ class ActuatorCollector(threading.Thread):
         client.on_disconnect = self.on_disconnect
         client.on_publish = self.on_publish
 
-        while True:
-            print('AC >> Actuator Manager waiting...')
-            
-            # 로컬 아닌, 원격 mqtt broker에 연결
-            # address : broker.hivemq.com
-            # port: 1883 에 연결
-            # 라즈베리파이 자신에게 MQTT 브로커가 설치되어 있으므로 자신의 IP를 넣어줌
-            client.connect(self.mqtt_broker_host, 1883)
-            client.loop_start()
-            # 'test/hello' 라는 topic 으로 메세지 발행
-            client.publish('test/sensor', send_data, 1)
-            client.loop_stop()
-            # 연결 종료
-            client.disconnect()
-
-
-    def thread(self, client_socket, addr):
-        receive_id = "device0000"
-        receive_id = self.receive(client_socket)
-        #print("AC >> ", receive_id)
-
-        table_name, item_id = self.dbm.get_item_list(receive_id)
-        #print("AC >> table name : ", table_name, ", item id : ", item_id)
-
-        if table_name != None and item_id != None:
-            # self.send(client_socket, 'reg')
-            print('AC >> Device is registered.')
-        else:
-            self.send(client_socket, 'notreg') # notreg : The device is not registered in DB
-            print('AC >> cannot find the table : ', receive_id)
-            return
+        print('AC >> Actuator Manager waiting...')
+        print(self.system_id)
+        table_name, item_id = self.dbm.get_item_list(self.system_id)
 
         num = self.dbm.get_information_cnt(table_name)
         num2 = self.dbm.get_data_cnt(table_name)
         print("table num : ", num, " | event num : ", num2)
 
         if (num==1 and num2>0):
-            # self.send(client_socket, '')
-            
             actlist = []
             actlist = self.dbm.get_distinct_actlist(table_name)
 
@@ -92,11 +63,17 @@ class ActuatorCollector(threading.Thread):
                     actuator=rs[0]
                     status=rs[1]
                     msg = actuator + ":" + status
-                    self.send(client_socket, msg)
-                    # print("AC >> ", msg)
+                    print(msg)
+                    
+                    # MQTT Broker의 주소 넣기
+                    client.connect(self.mqtt_broker_host, 1883)
+                    client.loop_start()
+                    client.publish('data/actuator', msg, 1)
+                    client.loop_stop()
+                    # 연결 종료
+                    client.disconnect()
 
                 self.dbm.delete_actuator_data(i, table_name)
-        else:
-            self.send(client_socket, 'noevt') # noevt : there is no event of the actutator
 
-                
+        time.sleep(5)
+            
