@@ -1,5 +1,5 @@
 import threading
-import mqtt_DBManager
+import DBManager
 import json
 import socket
 import paho.mqtt.client as mqtt
@@ -7,7 +7,7 @@ import paho.mqtt.client as mqtt
 BUFFSIZE = 4096
 
 class SensorCollector (threading.Thread):
-    def __init__(self, dbmanager = mqtt_DBManager.DBManager(), server_host='localhost', sensor_manager_port=11201, mqtt_broker_host='203.234.62.117'):
+    def __init__(self, dbmanager = DBManager.DBManager(), server_host='localhost', sensor_manager_port=11201, mqtt_broker_host='203.234.62.117'):
         threading.Thread.__init__(self)
 
         self.dbm = dbmanager

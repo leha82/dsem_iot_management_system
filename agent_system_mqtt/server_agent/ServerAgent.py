@@ -1,8 +1,8 @@
 import json
 import threading
-import mqtt_DBManager
-import mqtt_SensorCollector
-import mqtt_ActuatorCollector
+import DBManager
+import SensorCollector
+import ActuatorController
 
 
 if __name__ == "__main__":
@@ -22,11 +22,11 @@ if __name__ == "__main__":
         tbl_dl = fd['TblName_DeviceList']
 
     print(server_ip)
-    dbm = mqtt_DBManager.DBManager(db_host, db_user, db_pw, dbn_dr, dbn_measure, tbl_specific, tbl_dl)
+    dbm = DBManager.DBManager(db_host, db_user, db_pw, dbn_dr, dbn_measure, tbl_specific, tbl_dl)
     dbm.DB_Con()
 
-    sensor_collector = mqtt_SensorCollector.SensorCollector(dbm, server_ip, port_sensor, mqtt_broker_host)
-    actuator_collector = mqtt_ActuatorCollector.ActuatorCollector(dbm, server_ip, port_actuator, mqtt_broker_host)
+    sensor_collector = SensorCollector.SensorCollector(dbm, server_ip, port_sensor, mqtt_broker_host)
+    actuator_collector = ActuatorController.ActuatorController(dbm, server_ip, port_actuator, mqtt_broker_host)
     
     sensor_collector.start()
     actuator_collector.start()

@@ -8,7 +8,7 @@ import paho.mqtt.client as mqtt
 
 BUFFSIZE=1024
 
-class client_sensor(threading.Thread):
+class SensorPublisher(threading.Thread):
     def __init__(self, bt_socket, HOST, SYSTEM_ID, PORT_SENSOR, MQTT_BROKER_HOST):
         threading.Thread.__init__(self)
         self.bt_socket = bt_socket
