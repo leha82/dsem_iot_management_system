@@ -11,12 +11,12 @@ class SensorCollector (threading.Thread):
 
         self.dbm = dbmanager
         if server_host == 'localhost':
-            self.HOST = socket.gethostbyname(socket.getfqdn()) # 서버 ip주소 자신의 아이피로 자동 할당
+            self.HOST = socket.gethostbyname(socket.getfqdn()) # automatically assign ip address as server's own ip address
             print("set HOST:"+self.HOST)
         else:
             self.HOST = server_host
             print(self.HOST)
-        self.PORT = sensor_manager_port # 포트 는 10000이상으로 쓰고 겹치지 않는지 확인하며 할당 할 것
+        self.PORT = sensor_manager_port 
 
     def run(self):
         print('run Sensor Collector')
@@ -33,12 +33,10 @@ class SensorCollector (threading.Thread):
                 print('Connected by', addr)
 
                 sensor_thread = threading.Thread(target=self.thread, args=(client_socket, addr,))
-                sensor_thread.start()  # 수정 : start() 실험
-                # run()은 병행 처리를 못함 -> 이전의 스레드가 종료되어야 다른 스레드 실행됨
-                # start()는 병행 처리 가능 (start를 사용해야함)
+                sensor_thread.start()  
                 
         except KeyboardInterrupt:
-            print('동작을 중지하였습니다.')
+            print('Keyboard Interrupt. Program is Terminated')
 
     def send(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
@@ -62,13 +60,12 @@ class SensorCollector (threading.Thread):
                 print('Connected : ', system_id, ' [item id : ',item_id,']')
             else:
                 self.send(client_socket, 'no')
-                print('조회가 되질 않습니다')
+                print('Cannot find the system_id : ', system_id)
                 return
             
             receive_data = self.receive(client_socket)
 
             if receive_data != "":
-                # 보내는 데이터가 humidity=50.0!temperature=20.1!... 이런식으로 올 수 있도록
                 receive_data = receive_data.replace("'", "\"")
                 jsondata = json.loads(receive_data)
                 #print(type(jsondata))
@@ -76,32 +73,32 @@ class SensorCollector (threading.Thread):
                 del jsondata["system_id"]
                 print("receive_data:", jsondata)
 
-                # input_data를 key, value 리스트로 각각 분리해서 만들 수 있도록 해야함
+                # make key list and value list from received json data
                 key_list = []
                 value_list = []
                 for key, value in jsondata.items():
                     key_list.append(key)
                     value_list.append(value)
 
-                # Specific metadata에 저장된 sensor 및 actuator를 받아와 list up 시킴
+                # get sensor and actuator list from specific metadata table in database
                 DB_column = []
                 DB_column=self.dbm.get_sensor_actuator_list(item_id)
                 #print("DB_column : " , DB_column)
 
-                # DB_column의 리스트와 key 리스트를 비교하여 key 리스트의 값이 DB_column에 존재하지 않으면 해당 key는 db로 넣지 못함
-                # 수정 : 91~101 코드 정리
+                # make DB_column_list from select query result DB_Column.
                 DB_column_list = []
                 for i in range(len(DB_column)):
-                    DB_column_list.append(DB_column[i][0])  # (('humidity',), ('temperature', ), ...) 이런식으로 되어 있음
+                    DB_column_list.append(DB_column[i][0])  # DB_column has format like (('humidity',), ('temperature', ), ...) 
                 #print("DB_column_list : ", DB_column_list)
 
+                # make (key,value) list that only the key is included in db_column list
                 input_list = []
                 for i in range(len(key_list)):
-                    if key_list[i] in DB_column_list:   # in, not in : Java의 append함수
+                    if key_list[i] in DB_column_list:
                         input_list.append([key_list[i], str(value_list[i])])
                 print("input_list : ", input_list)
 
-                # key, value 리스트를 dbm의 insert_data로 넣도록 함
+                # insert the (key, value) list to device measurement db
                 self.dbm.insert_data(input_list, table_name)
                 client_socket.close()
             

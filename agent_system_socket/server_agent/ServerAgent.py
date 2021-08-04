@@ -31,5 +31,4 @@ if __name__ == "__main__":
     actuator_collector.start()
 
     actuator_collector.join()
-    sensor_collector.join()  # 수정 : join()? 확인
-    # join() : 해당 스레드가 종료되기까지 기다렸다가 다음으로 넘어감(스레드는 메인이 종료되어도 백그라운드에서 돌아감)
+    sensor_collector.join() 
