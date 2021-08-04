@@ -10,12 +10,12 @@ import threading
 BUFFSIZE=1024 
  
 class ActuatorSubscriber(threading.Thread): 
-    def __init__(self, bt_socket, HOST, SYSTEM_ID, PORT_ACTUATOR): 
+    # def __init__(self, bt_socket, HOST, SYSTEM_ID, PORT_ACTUATOR): 
+    def __init__(self, bt_socket, BROKER_IP = '', SYSTEM_ID = ''): 
         threading.Thread.__init__(self) 
         self.bt_socket = bt_socket 
-        self.HOST = HOST 
-        self.SYSTEM_ID = SYSTEM_ID 
-        self.PORT_ACTUATOR = PORT_ACTUATOR 
+        self.broker_ip = BROKER_IP
+        self.system_id = SYSTEM_ID 
              
     def tcpSend(self, client_socket, message): 
         client_socket.send(bytes(message,"UTF-8")) 
@@ -34,7 +34,7 @@ class ActuatorSubscriber(threading.Thread):
                 client_socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
                 client_socket1.connect((self.HOST, self.PORT_ACTUATOR)) 
  
-                self.tcpSend(client_socket1, self.SYSTEM_ID) 
+                self.tcpSend(client_socket1, self.system_id) 
                 recv_msg = self.tcpReceive(client_socket1) 
  
                 if recv_msg == "notreg": 

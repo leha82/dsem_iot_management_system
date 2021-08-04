@@ -7,14 +7,15 @@ import time
 BUFFSIZE = 4096
 
 class ActuatorController(threading.Thread):
-    def __init__(self, dbmanager = DBManager.DBManager(), server_host='localhost', actuator_manager_port=11202, mqtt_broker_host='203.234.62.117'):
+    # def __init__(self, dbmanager = DBManager.DBManager(), server_host='localhost', actuator_manager_port=11202, mqtt_broker_ip='203.234.62.117'):
+    def __init__(self, dbmanager = DBManager.DBManager(), mqtt_broker_ip=''):
         threading.Thread.__init__(self)
 
         self.dbm = dbmanager
-        self.system_id = "device0004"
-        self.mqtt_broker_host = mqtt_broker_host
+        # self.system_id = "device0004"
+        self.broker_ip = mqtt_broker_ip
 
-        self.PORT = actuator_manager_port 
+        # self.PORT = actuator_manager_port 
 
     # MQTT function
     def on_connect(self, client, userdata, flags, rc):
@@ -40,8 +41,9 @@ class ActuatorController(threading.Thread):
         client.on_publish = self.on_publish
 
         print('AC >> Actuator Manager waiting...')
-        print(self.system_id)
-        table_name, item_id = self.dbm.get_item_list(self.system_id)
+        # print(self.system_id)
+        system_id=""
+        table_name, item_id = self.dbm.get_item_list(system_id)
 
         num = self.dbm.get_information_cnt(table_name)
         num2 = self.dbm.get_data_cnt(table_name)
@@ -60,7 +62,7 @@ class ActuatorController(threading.Thread):
                     msg = actuator + ":" + status
                     print(msg)
                     
-                    client.connect(self.mqtt_broker_host, 1883)
+                    client.connect(self.broker_ip, 1883)
                     client.loop_start()
                     client.publish('data/actuator', msg, 1)
                     client.loop_stop()

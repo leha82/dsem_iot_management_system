@@ -9,13 +9,14 @@ import paho.mqtt.client as mqtt
 BUFFSIZE=1024
 
 class SensorPublisher(threading.Thread):
-    def __init__(self, bt_socket, HOST, SYSTEM_ID, PORT_SENSOR, MQTT_BROKER_HOST):
+    def __init__(self, bt_socket, MQTT_BROKER_IP, SYSTEM_ID):
+    # def __init__(self, bt_socket, HOST, PORT_SENSOR, MQTT_BROKER_HOST, SYSTEM_ID):
         threading.Thread.__init__(self)
         self.bt_socket = bt_socket
-        self.HOST = HOST
-        self.SYSTEM_ID = SYSTEM_ID
-        self.PORT_SENSOR = PORT_SENSOR
-        self.MQTT_BROKER_HOST = MQTT_BROKER_HOST
+        # self.HOST = HOST
+        # self.PORT_SENSOR = PORT_SENSOR
+        self.broker_ip = MQTT_BROKER_IP
+        self.system_id = SYSTEM_ID
 
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
@@ -54,15 +55,19 @@ class SensorPublisher(threading.Thread):
             
             jsondata = json.loads(recv_string)
             #print(type(jsondata))
-            print(jsondata)
+            print("received json : ", jsondata)
+
+            jsondata["system_id"] = self.system_id
+            print("system_id modified : ", jsondata)
             
-            SYSTEM_ID = jsondata["system_id"]
+            # SYSTEM_ID = jsondata["system_id"]
             send_data = json.dumps(jsondata)
-            #print("systemID", SYSTEM_ID)
+            # print("System ID : ", SYSTEM_ID)
+
             
-            client.connect('203.234.62.117', 1883)
+            client.connect(self.broker_ip, 1883)
             client.loop_start()
-            client.publish('test/sensor', send_data, 1)
+            client.publish('data/sensor', send_data, 1)
             client.loop_stop()
             client.disconnect()
 
