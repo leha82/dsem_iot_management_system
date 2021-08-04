@@ -8,7 +8,7 @@ BUFFSIZE = 4096
 # ConnectionRefusedError: [WinError 10061] 대상 컴퓨터에서 연결을 거부했으므로 연결하지 못했습니다.
 # 해결방안? 서버-클라이언트 통신 시험용으로 idel 사용 시, 서버와 클라이언트 프로그램을 각각의 idel.exe에서 실행할 것
 
-class ActuatorCollector(threading.Thread):
+class ActuatorController(threading.Thread):
     def __init__(self, dbmanager = DBManager.DBManager(), server_host='localhost', actuator_manager_port=11202):
         threading.Thread.__init__(self)
 
@@ -52,12 +52,11 @@ class ActuatorCollector(threading.Thread):
         return recv_msg
 
     def thread(self, client_socket, addr):
-        receive_id = "device0000"
         receive_id = self.receive(client_socket)
-        #print("AC >> ", receive_id)
+        print("AC >> ", receive_id)
 
         table_name, item_id = self.dbm.get_item_list(receive_id)
-        #print("AC >> table name : ", table_name, ", item id : ", item_id)
+        print("AC >> table name : ", table_name, ", item id : ", item_id)
 
         if table_name != None and item_id != None:
             # self.send(client_socket, 'reg')
@@ -90,6 +89,6 @@ class ActuatorCollector(threading.Thread):
                 self.dbm.delete_actuator_data(i, table_name)
         else:
             self.send(client_socket, 'noevt') # noevt : there is no event of the actutator
-            client_socket.close()
+        client_socket.close()
 
                 

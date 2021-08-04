@@ -51,7 +51,6 @@ class SensorCollector (threading.Thread):
 
     def thread(self, client_socket, addr):
         try:
-            system_id = "device0000"
             system_id = self.receive(client_socket)
             #print(receive_id)
 
@@ -100,7 +99,7 @@ class SensorCollector (threading.Thread):
                 for i in range(len(key_list)):
                     if key_list[i] in DB_column_list:   # in, not in : Java의 append함수
                         input_list.append([key_list[i], str(value_list[i])])
-                #print("input_list : ", input_list)
+                print("input_list : ", input_list)
 
                 # key, value 리스트를 dbm의 insert_data로 넣도록 함
                 self.dbm.insert_data(input_list, table_name)
