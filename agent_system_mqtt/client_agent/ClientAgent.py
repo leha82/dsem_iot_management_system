@@ -7,8 +7,6 @@ import paho.mqtt.client as mqtt
 import SensorPublisher as sp
 #import ActuatorSubscriber as as
 
-# 아두이노에서 데이터 보낼때 컬럼 붙이기
-
 if __name__ == "__main__":
     file_path = 'config.json'
     with open(file_path, "r") as fj:
