@@ -55,9 +55,10 @@ class DBManager:
     # check the actuator event is exist. 
     # if the actuation is exist, return 1. if not, return 0.
     def get_information_cnt(self, table_name):
+        print("insert get_information cnt function")
         sql = "SELECT count(*) FROM Information_schema.tables WHERE table_schema='" + self.DBN_dm + \
                             "' AND table_name='" + table_name + "_act';"
-        #print("dbm >> ", sql)
+        print("dbm >> ", sql)
         self.curs.execute(sql)
         rs = self.curs.fetchone()
         num = rs[0]

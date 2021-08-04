@@ -1,10 +1,7 @@
 {
-    "SERVER_IP": "input server ip address",
-    "PORT_Sensor": 11201, 
-    "PORT_Actuator": 11202, 
+    "MQTT_BROKER_IP": "input mqtt broker address (ip address)",
     "DB_Host": "input database address (ip address)", 
     "DB_Port": 3306,
-    "MQTT_BROKER_IP": "input mqtt broker address (ip address)",
     "DB_User": "input database user id", 
     "DB_Password": "input database password id", 
     "DBName_Registry": "DeviceRegistry", 
