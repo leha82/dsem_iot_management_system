@@ -4,7 +4,7 @@ except ImportError:
     print('not pymysql')
 
 class DBManager:
-    def __init__(self, DB_h='203.234.62.115', DB_p=3306, DB_u='dsem_iot',DB_pw='dsem_iot',DR_DB_NAME='DeviceRegistry',Sensor_DB_name="DeviceMeasurement",DB_s='specific_metadata',DB_r='device_register'):
+    def __init__(self, DB_h='', DB_p=3306, DB_u='',DB_pw='',DR_DB_NAME='DeviceRegistry',Sensor_DB_name="DeviceMeasurement",DB_s='specific_metadata',DB_r='device_register'):
         self.DB_Host= DB_h # DB 주소
         self.DB_Port= DB_p
         self.DB_User= DB_u # 접속할 아이디 
