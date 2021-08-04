@@ -41,7 +41,6 @@ class ActuatorController(threading.Thread):
         client.on_publish = self.on_publish
 
         print('AC >> Actuator Manager waiting...')
-        # print(self.system_id)
         system_id=""
         table_name, item_id = self.dbm.get_item_list(system_id)
 
