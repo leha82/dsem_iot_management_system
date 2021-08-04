@@ -3,6 +3,7 @@
     "PORT_Sensor": 11201, 
     "PORT_Actuator": 11202, 
     "DB_Host": "input database address (ip address)", 
+    "DB_Port": 3306,
     "DB_User": "input database user id", 
     "DB_Password": "input database password id", 
     "DBName_Registry": "DeviceRegistry", 
