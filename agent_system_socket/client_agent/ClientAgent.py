@@ -28,8 +28,8 @@ if __name__ == "__main__":
     bt_socket=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
     bt_socket.connect((BT_ADDR,BT_PORT))
     
-    sensor = sd.SensorDeliverer(bt_socket, HOST, SYSTEM_ID, PORT_SENSOR)
-    actuator = am.ActuatorManager(bt_socket, HOST, SYSTEM_ID, PORT_ACTUATOR)
+    sensor = sd.SensorDeliverer(bt_socket, HOST, PORT_SENSOR, SYSTEM_ID)
+    actuator = am.ActuatorManager(bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID)
     
     sensor.start()
     actuator.start()

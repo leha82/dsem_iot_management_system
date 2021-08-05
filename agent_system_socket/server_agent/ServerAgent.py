@@ -6,7 +6,7 @@ import ActuatorController
 
 
 if __name__ == "__main__":
-    file_path = 'config.json'
+    file_path = 'server_agent/config.json'
     with open(file_path, "r") as fj:
         fd = json.load(fj)
         server_ip = fd['SERVER_IP']

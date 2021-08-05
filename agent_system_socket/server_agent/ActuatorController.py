@@ -40,31 +40,30 @@ class ActuatorController(threading.Thread):
 
     def send(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
-        print("AC >> send : ", message)
+        # print("AC >> send : ", message)
 
     def receive(self, client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        print("AC >> receive : ", recv_msg)
+        # print("AC >> receive : ", recv_msg)
         return recv_msg
 
     def thread(self, client_socket, addr):
         receive_id = self.receive(client_socket)
-        print("AC >> ", receive_id)
+        # print("AC >> ", receive_id)
 
         table_name, item_id = self.dbm.get_item_list(receive_id)
-        print("AC >> table name : ", table_name, ", item id : ", item_id)
+        # print("AC >> table name : ", table_name, ", item id : ", item_id)
 
-        if table_name != None and item_id != None:
-            # self.send(client_socket, 'reg')
-            print('AC >> Device is registered.')
-        else:
+        if table_name == None or item_id == None:
             self.send(client_socket, 'notreg') # notreg : The device is not registered in DB
-            print('AC >> cannot find the table : ', receive_id)
+            # print('AC >> cannot find the table : ', receive_id)
             return
+        # else:
+        #     print('AC >> Device is registered.')
 
         num = self.dbm.get_information_cnt(table_name)
         num2 = self.dbm.get_data_cnt(table_name)
-        print("table num : ", num, " | event num : ", num2)
+        # print("table num : ", num, " | event num : ", num2)
 
         if (num==1 and num2>0):
             # self.send(client_socket, '')

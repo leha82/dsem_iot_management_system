@@ -10,12 +10,12 @@ import threading
 BUFFSIZE=1024
 
 class ActuatorManager(threading.Thread):
-    def __init__(self, bt_socket, HOST, SYSTEM_ID, PORT_ACTUATOR):
+    def __init__(self, bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID):
         threading.Thread.__init__(self)
         self.bt_socket = bt_socket
         self.HOST = HOST
-        self.SYSTEM_ID = SYSTEM_ID
         self.PORT_ACTUATOR = PORT_ACTUATOR
+        self.SYSTEM_ID = SYSTEM_ID
             
     def tcpSend(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
@@ -31,19 +31,19 @@ class ActuatorManager(threading.Thread):
         while True:
             try:
                 print("AA >> try to connect actuator agent of server...")
-                client_socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                client_socket1.connect((self.HOST, self.PORT_ACTUATOR))
+                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client_socket.connect((self.HOST, self.PORT_ACTUATOR))
 
-                self.tcpSend(client_socket1, self.SYSTEM_ID)
-                recv_msg = self.tcpReceive(client_socket1)
+                self.tcpSend(client_socket, self.SYSTEM_ID)
+                recv_msg = self.tcpReceive(client_socket)
 
-                if recv_msg == "notreg":
-                    print("AA >> This device is not registered!")
-                elif recv_msg == "noevt":
-                    print("AA >> There is no event for all actutators")
-                else :
+                if recv_msg != "notreg" and recv_msg != "noevt":
                     # received message >> actuator:status
                     self.bt_socket.send(recv_msg)     
+                elif recv_msg == "notreg":
+                    print("AA >> This device is not registered!")
+                # elif recv_msg == "noevt":
+                #     print("AA >> There is no event for all actutators")
 
             except KeyboardInterrupt:
                 print("AA >> Client stopped")
@@ -51,5 +51,5 @@ class ActuatorManager(threading.Thread):
             except :
                 print("AA >> TCP connection error")
 
-            client_socket1.close()
+            client_socket.close()
             sleep(5)
