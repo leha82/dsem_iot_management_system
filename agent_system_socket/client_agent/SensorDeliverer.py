@@ -19,11 +19,11 @@ class SensorDeliverer(threading.Thread):
 
     def tcpSend(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
-        # print(frontstr, "send : ", message)
+        print(frontstr, "send to server : ", message)
 
     def tcpReceive(self, client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        # print(frontstr, "receive : ", recv_msg)
+        print(frontstr, "receive from server : ", recv_msg)
         return recv_msg
 
     def run(self):
@@ -47,16 +47,16 @@ class SensorDeliverer(threading.Thread):
                         break
                 
                 jsondata = json.loads(recv_string)
+                print(frontstr, "receive from bluetooth : ", jsondata)
                 #print(type(jsondata))
                 # add system_id to json object
                 jsondata["system_id"] = self.SYSTEM_ID
-                print(frontstr, "Bluetooth and system_id : ", jsondata)
 
-                print(frontstr, "try to connect sensor collector...")
+                print(frontstr, "Connecting server ... ", end="")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_SENSOR))
 
-                print(frontstr, "connection success!")
+                print("Success!!")
         
                 # self.tcpSend(client_socket, self.SYSTEM_ID)
                 # recv_msg = self.tcpReceive(client_socket)
@@ -67,13 +67,13 @@ class SensorDeliverer(threading.Thread):
                 recv_msg = self.tcpReceive(client_socket)
 
                 if recv_msg == "notreg":
-                    print(frontstr, "This device is not registered!")
+                    print(frontstr, self.SYSTEM_ID, " : Device is not registered!")
                     loop = False
                 elif recv_msg == "accept":
                     print(frontstr, "Sensor data is stored.")
                 else:
-                    print(frontstr, "An error is occured.")
-                    
+                    print(frontstr, recv_msg, ": Message is not defined")
+
             # while-try style
             # except KeyboardInterrupt:
             #     print(frontstr, "Client stopped")
@@ -83,14 +83,13 @@ class SensorDeliverer(threading.Thread):
 
         # try-while style
         except KeyboardInterrupt:
-            print(frontstr, "Client stopped")
+            print(frontstr, "Sensor Deliverer is stopped")
         except Exception as e :
-            print(frontstr, "error > ", e)
+            print(frontstr, "Error is occured : ", e)
 
 
         client_socket.close()
-        self.bt_socket.close()
-        print(frontstr, "close client socket")
+        print(frontstr, "Closing socket server")
 
    
 

@@ -6,6 +6,8 @@ import json
 import SensorDeliverer as sd
 import ActuatorManager as am
 
+frontstr = "Client >> "
+
 if __name__ == "__main__":
     file_path = 'config.json'
     with open(file_path, "r") as fj:
@@ -23,26 +25,31 @@ if __name__ == "__main__":
     print("Server Host Actuator : ", HOST, " | Port : ", PORT_ACTUATOR)
     print("Bluetooth Address : ", BT_ADDR, "Port : ", BT_PORT)
 
-    # Bluetooth Socket
-    try :
-        print("bluetooth socket setting")
-        bt_socket=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    loop = True
 
-        print("bluetooth connecting")
-        bt_socket.connect((BT_ADDR,BT_PORT))
+    while loop:
+        # Bluetooth Socket
+        try :
+            print("bluetooth socket setting")
+            bt_socket=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 
-        print("bluetooth connected")
-        sensor = sd.SensorDeliverer(bt_socket, HOST, PORT_SENSOR, SYSTEM_ID)
-        actuator = am.ActuatorManager(bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID)
-        
-        sensor.start()
-        # actuator.start()
-        
-        sensor.join()
-        # actuator.join()
-    except Exception as e :
-         # self.send(client_socket, 'no')
-        print("error > ", e)
+            print("bluetooth connecting")
+            bt_socket.connect((BT_ADDR,BT_PORT))
 
-    bt_socket.close()
+            print("bluetooth connected")
+            sensor = sd.SensorDeliverer(bt_socket, HOST, PORT_SENSOR, SYSTEM_ID)
+            actuator = am.ActuatorManager(bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID)
+            
+            sensor.start()
+            # actuator.start()
+            
+            sensor.join()
+            # actuator.join()
+        except Exception as e :
+            # self.send(client_socket, 'no')
+            print("error > ", e)
+
+        bt_socket.close()
+        print(frontstr, "Bluetooth socket closed.")
+
 
