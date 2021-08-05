@@ -27,7 +27,7 @@ if __name__ == "__main__":
     try :
         print("bluetooth socket setting")
         bt_socket=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        
+
         print("bluetooth connecting")
         bt_socket.connect((BT_ADDR,BT_PORT))
 
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         actuator = am.ActuatorManager(bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID)
         
         sensor.start()
-        actuator.start()
+        # actuator.start()
         
         sensor.join()
         # actuator.join()
