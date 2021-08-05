@@ -23,17 +23,21 @@ if __name__ == "__main__":
     print("Bluetooth Address : ", BT_ADDR, "Port : ", BT_PORT)
 
     # Bluetooth Socket
-    bt_socket=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-    bt_socket.connect((BT_ADDR,BT_PORT))
-    
-    sensor = sd.SensorDeliverer(bt_socket, HOST, PORT_SENSOR, SYSTEM_ID)
-    actuator = am.ActuatorManager(bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID)
-    
-    sensor.start()
-    actuator.start()
-    
-    sensor.join()
-    actuator.join()
-    
+    try :
+        bt_socket=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        bt_socket.connect((BT_ADDR,BT_PORT))
+        
+        sensor = sd.SensorDeliverer(bt_socket, HOST, PORT_SENSOR, SYSTEM_ID)
+        actuator = am.ActuatorManager(bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID)
+        
+        sensor.start()
+        actuator.start()
+        
+        sensor.join()
+        actuator.join()
+    except Exception as e :
+         # self.send(client_socket, 'no')
+        print("error > ", e)
+
     bt_socket.close()
 
