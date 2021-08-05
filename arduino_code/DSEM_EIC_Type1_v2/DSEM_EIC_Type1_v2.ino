@@ -130,7 +130,6 @@ void loop() {
     lcd.print("L:");  lcd.print(cds);
   
     // LED Light Change
-    led_red = 0;  led_green = 0;  led_blue = 0;
     if (led_status==1) {
       if (dust < 35) {           // air quality is good : blue light
         led_red = 0;  led_green = 0;  led_blue = 255;
@@ -139,6 +138,8 @@ void loop() {
       } else if (dust >= 100) {  // air quality is good : red light
         led_red = 255;  led_green = 0;  led_blue = 0;
       }
+    } else {
+      led_red = 0;  led_green = 0;  led_blue = 0;
     }
     analogWrite(LEDRED_PIN, led_red);
     analogWrite(LEDGREEN_PIN, led_green);

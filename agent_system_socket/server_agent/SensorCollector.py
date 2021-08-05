@@ -51,20 +51,9 @@ class SensorCollector (threading.Thread):
 
     def thread(self, client_socket, addr):
         try:
-            system_id = self.receive(client_socket)
-            print(frontstr, system_id)
-            
-            table_name, item_id = self.dbm.get_item_list(system_id)
-            print(frontstr, "table name : ", table_name, ", item id : ", item_id)
+            # system_id = self.receive(client_socket)
+            # print(frontstr, system_id)
 
-            if table_name != None and item_id != None:
-                self.send(client_socket, 'yes')
-                print(frontstr, "Connected : ", system_id, " [item id : ", item_id, "]")
-            else:
-                self.send(client_socket, 'no')
-                print(frontstr, "Cannot find the system_id : ", system_id)
-                return
-            
             receive_data = self.receive(client_socket)
             
             if receive_data != "":
@@ -72,40 +61,52 @@ class SensorCollector (threading.Thread):
                 jsondata = json.loads(receive_data)
                 #print(type(jsondata))
 
-                del jsondata["system_id"]
-                print(frontstr, "receive_data:", jsondata)
+                system_id = jsondata["system_id"]
 
-                # make key list and value list from received json data
-                key_list = []
-                value_list = []
-                for key, value in jsondata.items():
-                    key_list.append(key)
-                    value_list.append(value)
+                table_name, item_id = self.dbm.get_item_list(system_id)
+                print(frontstr, "table name : ", table_name, ", item id : ", item_id)
 
-                # get sensor and actuator list from specific metadata table in database
-                DB_column = []
-                DB_column=self.dbm.get_sensor_actuator_list(item_id)
-                print(frontstr, "DB_column : " , DB_column)
+                if table_name == None or item_id == None:
+                    self.send(client_socket, "notreg")
+                    print(frontstr, "Cannot find the system_id : ", system_id)
+                else:
+                    print(frontstr, "Connected : ", system_id, " [item id : ", item_id, "]")
 
-                # make DB_column_list from select query result DB_Column.
-                DB_column_list = []
-                for i in range(len(DB_column)):
-                    DB_column_list.append(DB_column[i][0])  # DB_column has format like (('humidity',), ('temperature', ), ...) 
-                print(frontstr, "DB_column_list : ", DB_column_list)
+                    del jsondata["system_id"]
+                    print(frontstr, "receive_data:", jsondata)
 
-                # make (key,value) list that only the key is included in db_column list
-                input_list = []
-                for i in range(len(key_list)):
-                    if key_list[i] in DB_column_list:
-                        input_list.append([key_list[i], str(value_list[i])])
-                print(frontstr, "input_list : ", input_list)
+                    # make key list and value list from received json data
+                    key_list = []
+                    value_list = []
+                    for key, value in jsondata.items():
+                        key_list.append(key)
+                        value_list.append(value)
 
-                # insert the (key, value) list to device measurement db
-                self.dbm.insert_data(input_list, table_name)
-                client_socket.close()
+                    # get sensor and actuator list from specific metadata table in database
+                    DB_column = []
+                    DB_column=self.dbm.get_sensor_actuator_list(item_id)
+                    print(frontstr, "DB_column : " , DB_column)
+
+                    # make DB_column_list from select query result DB_Column.
+                    DB_column_list = []
+                    for i in range(len(DB_column)):
+                        DB_column_list.append(DB_column[i][0])  # DB_column has format like (('humidity',), ('temperature', ), ...) 
+                    print(frontstr, "DB_column_list : ", DB_column_list)
+
+                    # make (key,value) list that only the key is included in db_column list
+                    input_list = []
+                    for i in range(len(key_list)):
+                        if key_list[i] in DB_column_list:
+                            input_list.append([key_list[i], str(value_list[i])])
+                    print(frontstr, "input_list : ", input_list)
+
+                    # insert the (key, value) list to device measurement db
+                    self.dbm.insert_data(input_list, table_name)
+                    self.send(client_socket, "accept")
+
+            client_socket.close()
             
         except Exception as e :
-            # self.send(client_socket, 'no')
             print(frontstr, "error > ", e)
             
             return

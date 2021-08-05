@@ -19,11 +19,11 @@ class SensorDeliverer(threading.Thread):
 
     def tcpSend(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
-        print(frontstr, "send : ", message)
+        # print(frontstr, "send : ", message)
 
     def tcpReceive(self, client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        print(frontstr, "receive : ", recv_msg)
+        # print(frontstr, "receive : ", recv_msg)
         return recv_msg
 
     def run(self):
@@ -33,7 +33,8 @@ class SensorDeliverer(threading.Thread):
         #     try:
 
         try:
-            while True:
+            loop = True
+            while loop:
 
                 # Receive message from bluetooth
                 recv_string = ""
@@ -47,29 +48,26 @@ class SensorDeliverer(threading.Thread):
                 
                 jsondata = json.loads(recv_string)
                 #print(type(jsondata))
-                print(frontstr, "Bluetooth : ", jsondata)
-                
+                # add system_id to json object
                 jsondata["system_id"] = self.SYSTEM_ID
-                
+                print(frontstr, "Bluetooth and system_id : ", jsondata)
+
                 print(frontstr, "try to connect sensor collector...")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_SENSOR))
 
                 print(frontstr, "connection success!")
         
-                # while True:
-                self.tcpSend(client_socket, self.SYSTEM_ID)
-                recv_msg = self.tcpReceive(client_socket)
-    
-                if recv_msg == "yes":
-                    break
-                elif recv_msg == "no":
-                    print(frontstr, "This device is not registered!")
-                    sys.exit(0)
-            
+                # self.tcpSend(client_socket, self.SYSTEM_ID)
+                # recv_msg = self.tcpReceive(client_socket)
+        
                 # Send data
                 send_data = json.dumps(jsondata) # dict -> string
                 self.tcpSend(client_socket, send_data)
+
+                if recv_msg == "notreg":
+                    print(frontstr, "This device is not registered!")
+                    loop = False
 
             # while-try style
             # except KeyboardInterrupt:
