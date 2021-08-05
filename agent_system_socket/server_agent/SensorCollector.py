@@ -62,7 +62,7 @@ class SensorCollector (threading.Thread):
                 #print(type(jsondata))
 
                 system_id = jsondata["system_id"]
-
+                print(frontstr,"system_id :", system_id)
                 table_name, item_id = self.dbm.get_item_list(system_id)
                 print(frontstr, "table name : ", table_name, ", item id : ", item_id)
 

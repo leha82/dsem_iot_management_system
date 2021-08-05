@@ -27,11 +27,11 @@ class DBManager:
         return '\''+str(s)+'\''
 
     # get a list of all items from device registry
-    def get_item_list(self, receive_id):
+    def get_item_list(self, system_id):
         try:
             sql = "SELECT system_id, table_name, item_id FROM " + self.DBN_dr + "." + self.tbl_dl + \
-                            " WHERE system_id = " + self.addsq(receive_id) + ";"
-            # print(frontstr, sql)
+                            " WHERE system_id = " + self.addsq(system_id) + ";"
+            print(frontstr, sql)
             self.curs.execute(sql)
             result = self.curs.fetchone()
             if(result[0] is not None):

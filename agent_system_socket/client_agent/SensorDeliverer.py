@@ -64,11 +64,16 @@ class SensorDeliverer(threading.Thread):
                 # Send data
                 send_data = json.dumps(jsondata) # dict -> string
                 self.tcpSend(client_socket, send_data)
+                recv_msg = self.tcpReceive(client_socket)
 
                 if recv_msg == "notreg":
                     print(frontstr, "This device is not registered!")
                     loop = False
-
+                elif recv_msg == "accept":
+                    print(frontstr, "Sensor data is stored.")
+                else:
+                    print(frontstr, "An error is occured.")
+                    
             # while-try style
             # except KeyboardInterrupt:
             #     print(frontstr, "Client stopped")
