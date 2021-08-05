@@ -61,7 +61,7 @@ class SensorDeliverer(threading.Thread):
                 #print(type(jsondata))
                 print(frontstr, jsondata)
                 
-                self.SYSTEM_ID = jsondata["system_id"]
+                # self.SYSTEM_ID = jsondata["system_id"]
                 
                 print(frontstr, "try to connect sensor agent of server...")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

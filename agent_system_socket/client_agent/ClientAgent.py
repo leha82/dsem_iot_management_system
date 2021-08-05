@@ -32,10 +32,10 @@ if __name__ == "__main__":
     actuator = am.ActuatorManager(bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID)
     
     sensor.start()
-    actuator.start()
+    # actuator.start()
     
     sensor.join()
-    actuator.join()
+    # actuator.join()
     
     bt_socket.close()
 

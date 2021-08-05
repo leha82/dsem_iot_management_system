@@ -21,7 +21,7 @@ class SensorCollector (threading.Thread):
         self.PORT = sensor_manager_port 
 
     def run(self):
-        print(frontstr, 'run Sensor Collector')
+        print(frontstr, "run Sensor Collector")
         server_socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server_socket1.bind((self.HOST, self.PORT))
@@ -29,16 +29,16 @@ class SensorCollector (threading.Thread):
 
         try:
             while True:
-                print(frontstr, 'Sensor Manager waiting...')
+                print(frontstr, "Sensor Manager waiting...")
 
                 client_socket, addr = server_socket1.accept()
-                print(frontstr, 'Connected by', addr)
+                print(frontstr, "Connected by ", addr)
 
                 sensor_thread = threading.Thread(target=self.thread, args=(client_socket, addr,))
                 sensor_thread.start()  
                 
         except KeyboardInterrupt:
-            print(frontstr, 'Keyboard Interrupt. Program is Terminated')
+            print(frontstr, "Keyboard Interrupt. Program is Terminated")
 
     def send(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
@@ -59,10 +59,10 @@ class SensorCollector (threading.Thread):
 
             if table_name != None and item_id != None:
                 self.send(client_socket, 'yes')
-                print(frontstr, 'Connected : ', system_id, ' [item id : ',item_id,']')
+                print(frontstr, "Connected : ", system_id, " [item id : ", item_id, "]")
             else:
                 self.send(client_socket, 'no')
-                print(frontstr, 'Cannot find the system_id : ', system_id)
+                print(frontstr, "Cannot find the system_id : ", system_id)
                 return
             
             receive_data = self.receive(client_socket)

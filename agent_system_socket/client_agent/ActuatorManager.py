@@ -9,6 +9,8 @@ import threading
 
 BUFFSIZE=1024
 
+frontstr = "AM >> "
+
 class ActuatorManager(threading.Thread):
     def __init__(self, bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID):
         threading.Thread.__init__(self)
@@ -19,18 +21,18 @@ class ActuatorManager(threading.Thread):
             
     def tcpSend(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
-        print("AA >> send : ", message)
+        print(frontstr, "send : ", message)
 
     def tcpReceive(self, client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        print("AA >> receive : ", recv_msg)
+        print(frontstr, "receive : ", recv_msg)
         return recv_msg
     
     def run(self):  
             
         while True:
             try:
-                print("AA >> try to connect actuator agent of server...")
+                print(frontstr, "try to connect actuator agent of server...")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_ACTUATOR))
 
@@ -41,15 +43,15 @@ class ActuatorManager(threading.Thread):
                     # received message >> actuator:status
                     self.bt_socket.send(recv_msg)     
                 elif recv_msg == "notreg":
-                    print("AA >> This device is not registered!")
-                # elif recv_msg == "noevt":
-                #     print("AA >> There is no event for all actutators")
+                    print(frontstr, "This device is not registered!")
+                elif recv_msg == "noevt":
+                    print(frontstr, "There is no event for all actutators")
 
             except KeyboardInterrupt:
-                print("AA >> Client stopped")
+                print(frontstr, "Client stopped")
                 break
             except :
-                print("AA >> TCP connection error")
+                print(frontstr, "TCP connection error")
 
             client_socket.close()
             sleep(5)
