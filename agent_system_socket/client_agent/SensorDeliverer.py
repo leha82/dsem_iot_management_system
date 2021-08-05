@@ -29,8 +29,12 @@ class SensorDeliverer(threading.Thread):
     def run(self):
         send_data=""
 
-        while True:
-            try:
+        # while True:
+        #     try:
+
+        try:
+            while True:
+
                 # Receive message from bluetooth
                 recv_string = ""
                 
@@ -66,12 +70,20 @@ class SensorDeliverer(threading.Thread):
                 # Send data
                 send_data = json.dumps(jsondata) # dict -> string
                 self.tcpSend(client_socket, send_data)
-                
-            except KeyboardInterrupt:
-                print(frontstr, "Client stopped")
-                break;
-            except Exception as e :
-                print(frontstr, "error > ", e)
+
+            # while-try style
+            # except KeyboardInterrupt:
+            #     print(frontstr, "Client stopped")
+            #     break;
+            # except Exception as e :
+            #     print(frontstr, "error > ", e)
+
+        # try-while style
+        except KeyboardInterrupt:
+            print(frontstr, "Client stopped")
+        except Exception as e :
+            print(frontstr, "error > ", e)
+
 
         client_socket.close()
         self.bt_socket.close()

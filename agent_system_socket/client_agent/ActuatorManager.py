@@ -30,8 +30,11 @@ class ActuatorManager(threading.Thread):
     
     def run(self):  
             
-        while True:
-            try:
+        # while True:
+        #     try:
+
+        try:
+            while True:
                 print(frontstr, "try to connect actuator agent of server...")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_ACTUATOR))
@@ -46,14 +49,21 @@ class ActuatorManager(threading.Thread):
                     print(frontstr, "This device is not registered!")
                 elif recv_msg == "noevt":
                     print(frontstr, "There is no event for all actutators")
+                
+            # while-try style
+            # except KeyboardInterrupt:
+            #     print(frontstr, "Client stopped")
+            #     break;
+            # except Exception as e :
+            #     print(frontstr, "error > ", e)
+            # sleep(5)
 
-            except KeyboardInterrupt:
-                print(frontstr, "Client stopped")
-                break;
-            except Exception as e :
-                print(frontstr, "error > ", e)
-
-            sleep(5)
+        # try-while style
+                sleep(5)
+        except KeyboardInterrupt:
+            print(frontstr, "Client stopped")
+        except Exception as e :
+            print(frontstr, "error > ", e)
 
         client_socket.close()
 
