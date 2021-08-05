@@ -7,6 +7,8 @@ import json
 
 BUFFSIZE=1024
 
+frontstr = "SD >> "
+
 class SensorDeliverer(threading.Thread):
     def __init__(self, bt_socket, HOST, PORT_SENSOR, SYSTEM_ID):
         threading.Thread.__init__(self)
@@ -33,11 +35,11 @@ class SensorDeliverer(threading.Thread):
 
     def tcpSend(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
-        print("SA >> tcp send : ", message)
+        print(frontstr, "send : ", message)
 
     def tcpReceive(self, client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        print("SA >> tcp receive : ", recv_msg)
+        print(frontstr, "receive : ", recv_msg)
         return recv_msg
 
     def run(self):
@@ -57,11 +59,11 @@ class SensorDeliverer(threading.Thread):
                 
                 jsondata = json.loads(recv_string)
                 #print(type(jsondata))
-                print(jsondata)
+                print(frontstr, jsondata)
                 
                 self.SYSTEM_ID = jsondata["system_id"]
                 
-                print("SA >> try to connect sensor agent of server...")
+                print(frontstr, "try to connect sensor agent of server...")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_SENSOR))
         
@@ -72,7 +74,7 @@ class SensorDeliverer(threading.Thread):
                     if recv_msg == "yes":
                         break
                     elif recv_msg == "no":
-                        print("SA >> This device is not registered!")
+                        print(frontstr, "This device is not registered!")
                         sys.exit(0)
             
                 # Send data
@@ -80,12 +82,12 @@ class SensorDeliverer(threading.Thread):
                 self.tcpSend(client_socket, send_data)
                 
             except KeyboardInterrupt:
-                print("SA >> Client stopped")
+                print(frontstr, "Client stopped")
                 break
             except :
-                print("SA >> TCP protocol error")
+                print(frontstr, "TCP protocol error")
 
         client_socket.close()
-        print("SA >> close client socket")
+        print(frontstr, "close client socket")
    
 

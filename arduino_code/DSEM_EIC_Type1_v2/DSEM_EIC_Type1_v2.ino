@@ -121,7 +121,7 @@ void loop() {
     lcd.print("H:");  lcd.print(humi);  lcd.print("%");
     
     lcd.setCursor(8, 0);
-    lcd.print("T:");  lcd.print(temp);  lcd.print("ºC");
+    lcd.print("T:");  lcd.print(temp);  lcd.print("C");
     
     lcd.setCursor(0, 1);
     lcd.print("D:");  lcd.print(disp_dust);  lcd.print("ug");
