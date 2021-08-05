@@ -34,7 +34,7 @@ if __name__ == "__main__":
         actuator.start()
         
         sensor.join()
-        actuator.join()
+        # actuator.join()
     except Exception as e :
          # self.send(client_socket, 'no')
         print("error > ", e)
