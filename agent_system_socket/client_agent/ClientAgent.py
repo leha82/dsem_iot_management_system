@@ -1,6 +1,7 @@
 import socket
 from select import *
 import sys
+from time import sleep
 import bluetooth
 import json
 import SensorDeliverer as sd
@@ -30,26 +31,27 @@ if __name__ == "__main__":
     while loop:
         # Bluetooth Socket
         try :
-            print("bluetooth socket setting")
+            print(frontstr, "Bluetooth connecting ... ", end="")
             bt_socket=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-
-            print("bluetooth connecting")
             bt_socket.connect((BT_ADDR,BT_PORT))
+            print("Success!!")
 
-            print("bluetooth connected")
             sensor = sd.SensorDeliverer(bt_socket, HOST, PORT_SENSOR, SYSTEM_ID)
             actuator = am.ActuatorManager(bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID)
             
             sensor.start()
-            # actuator.start()
+            actuator.start()
             
             sensor.join()
-            # actuator.join()
+            actuator.join()
+        except KeyboardInterrupt:
+            print(frontstr, "ClientAgent is stopped.")
         except Exception as e :
-            # self.send(client_socket, 'no')
-            print("error > ", e)
+            print(frontstr, "Error is occured : ", e)
 
         bt_socket.close()
         print(frontstr, "Bluetooth socket closed.")
+        print(frontstr, "Sleep 5 sec for next connection.")
+        sleep(5)
 
 

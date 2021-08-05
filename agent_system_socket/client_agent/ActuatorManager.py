@@ -34,22 +34,22 @@ class ActuatorManager(threading.Thread):
         #     try:
 
         try:
-            while True:
-                print(frontstr, "try to connect actuator agent of server...")
+            loop = True
+            while loop:
+                print(frontstr, "Connecting actuator controller of server...")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_ACTUATOR))
 
                 self.tcpSend(client_socket, self.SYSTEM_ID)
                 recv_msg = self.tcpReceive(client_socket)
 
-                if recv_msg != "notreg" and recv_msg != "noevt":
-                    # received message >> actuator:status
-                    self.bt_socket.send(recv_msg)     
-                elif recv_msg == "notreg":
-                    print(frontstr, "This device is not registered!")
+                if recv_msg == "notreg":
+                    print(frontstr, "This device is not registered! for actuator")
+                    loop = False
                 elif recv_msg == "noevt":
                     print(frontstr, "There is no event for all actutators")
-                
+                else:
+                    self.bt_socket.send(recv_msg)     
             # while-try style
             # except KeyboardInterrupt:
             #     print(frontstr, "Client stopped")
@@ -61,9 +61,10 @@ class ActuatorManager(threading.Thread):
         # try-while style
                 sleep(5)
         except KeyboardInterrupt:
-            print(frontstr, "Client stopped")
+            print(frontstr, "ActuatorManager is stopped")
         except Exception as e :
-            print(frontstr, "error > ", e)
+            print(frontstr, "Error : ", e)
 
         client_socket.close()
+        print(frontstr, "Socket for actuator agent is closed.")
 
