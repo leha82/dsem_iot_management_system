@@ -47,12 +47,13 @@ class ActuatorManager(threading.Thread):
                 elif recv_msg == "noevt":
                     print(frontstr, "There is no event for all actutators")
 
-                sleep(5)
             except KeyboardInterrupt:
                 print(frontstr, "Client stopped")
                 break;
             except Exception as e :
                 print(frontstr, "error > ", e)
+
+            sleep(5)
 
         client_socket.close()
 

@@ -70,7 +70,7 @@ void loop() {
   // one loop has 0.5 sec delay
   // sensing per 5 sec, actuating per 1 sec
 
-  if (curr_time % ACTUATION_TIME == 0) {
+//  if (curr_time % ACTUATION_TIME == 0) {
 //    Serial.print("check actuation : "); Serial.println(curr_time); 
     // BluetoothSerial Read as json format
     while (BTSerial.available() > 0) {
@@ -88,7 +88,7 @@ void loop() {
         led_status = value.toInt();
       }
     }
-  }
+//  }
 
   // read DustSensor
   digitalWrite(DUSTLED_PIN, LOW); 
