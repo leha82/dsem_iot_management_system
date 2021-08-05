@@ -53,7 +53,7 @@ class SensorCollector (threading.Thread):
         try:
             system_id = self.receive(client_socket)
             print(frontstr, system_id)
-
+            
             table_name, item_id = self.dbm.get_item_list(system_id)
             print(frontstr, "table name : ", table_name, ", item id : ", item_id)
 

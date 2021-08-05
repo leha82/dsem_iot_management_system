@@ -74,6 +74,8 @@ class SensorDeliverer(threading.Thread):
                 print(frontstr, "TCP protocol error")
 
         client_socket.close()
+        self.bt_socket.close()
         print(frontstr, "close client socket")
+
    
 
