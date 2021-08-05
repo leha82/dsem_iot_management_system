@@ -18,6 +18,7 @@ if __name__ == "__main__":
         SYSTEM_ID = fd['SYSTEM_ID']
 
     print("System ID : ", SYSTEM_ID)
+    print("System ID Type : ", type(SYSTEM_ID))
     print("Server Host Sensor : ", HOST, " | Port : ", PORT_SENSOR)
     print("Server Host Actuator : ", HOST, " | Port : ", PORT_ACTUATOR)
     print("Bluetooth Address : ", BT_ADDR, "Port : ", BT_PORT)
