@@ -52,11 +52,11 @@ class SensorDeliverer(threading.Thread):
                 # add system_id to json object
                 jsondata["system_id"] = self.SYSTEM_ID
 
-                print(frontstr, "Connecting server ... ", end="")
+                print(frontstr, "Connecting sensor collector ... ")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_SENSOR))
+                print(frontstr, "Connection success!!")
 
-                print("Success!!")
         
                 # self.tcpSend(client_socket, self.SYSTEM_ID)
                 # recv_msg = self.tcpReceive(client_socket)

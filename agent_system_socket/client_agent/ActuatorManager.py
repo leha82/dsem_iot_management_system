@@ -36,11 +36,11 @@ class ActuatorManager(threading.Thread):
         try:
             loop = True
             while loop:
-                print(frontstr, "Connecting actuator controller of server ... ", end="")
+                print(frontstr, "Connecting actuator controller ... ")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_ACTUATOR))
-                print("Success!!")
-                
+                print(frontstr, "Connection success!!")
+
                 self.tcpSend(client_socket, self.SYSTEM_ID)
                 recv_msg = self.tcpReceive(client_socket)
 
