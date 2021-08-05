@@ -6,8 +6,6 @@ import json
 import SensorDeliverer as sd
 import ActuatorManager as am
 
-# 아두이노에서 데이터 보낼때 컬럼 붙이기
-
 if __name__ == "__main__":
     file_path = 'config.json'
     with open(file_path, "r") as fj:
@@ -32,10 +30,10 @@ if __name__ == "__main__":
     actuator = am.ActuatorManager(bt_socket, HOST, PORT_ACTUATOR, SYSTEM_ID)
     
     sensor.start()
-    # actuator.start()
+    actuator.start()
     
     sensor.join()
-    # actuator.join()
+    actuator.join()
     
     bt_socket.close()
 

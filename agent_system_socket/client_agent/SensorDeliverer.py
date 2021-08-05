@@ -17,22 +17,6 @@ class SensorDeliverer(threading.Thread):
         self.PORT_SENSOR = PORT_SENSOR
         self.SYSTEM_ID = SYSTEM_ID
 
-    # json 형태로 변환
-    # def format_data(self, msg):
-    #     msg_list = msg.split(" ")
-        
-    #     humi = msg_list[0]
-    #     temp = msg_list[1]
-    #     cds = msg_list[2]
-    #     dust = msg_list[3]
-    #     led = msg_list[4]
-        
-    #     result = humi + "!" + temp + "!" + cds + "!" + dust + "!" + led
-    #     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    #     send_data = date + "!" + result
-    #     print(send_data)
-    #     return send_data
-
     def tcpSend(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
         print(frontstr, "send : ", message)
