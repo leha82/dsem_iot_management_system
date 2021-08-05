@@ -43,7 +43,7 @@ class SensorDeliverer(threading.Thread):
                 
                 jsondata = json.loads(recv_string)
                 #print(type(jsondata))
-                print(frontstr, jsondata)
+                print(frontstr, "Bluetooth : ", jsondata)
                 
                 jsondata["system_id"] = self.SYSTEM_ID
                 
