@@ -29,8 +29,8 @@ class SensorDeliverer(threading.Thread):
     def run(self):
         send_data=""
 
-        try:
-            while True:
+        while True:
+            try:
                 # Receive message from bluetooth
                 recv_string = ""
                 
@@ -53,24 +53,25 @@ class SensorDeliverer(threading.Thread):
 
                 print(frontstr, "connection success!")
         
-                while True:
-                    self.tcpSend(client_socket, self.SYSTEM_ID)
-                    recv_msg = self.tcpReceive(client_socket)
-        
-                    if recv_msg == "yes":
-                        break
-                    elif recv_msg == "no":
-                        print(frontstr, "This device is not registered!")
-                        sys.exit(0)
+                # while True:
+                self.tcpSend(client_socket, self.SYSTEM_ID)
+                recv_msg = self.tcpReceive(client_socket)
+    
+                if recv_msg == "yes":
+                    break
+                elif recv_msg == "no":
+                    print(frontstr, "This device is not registered!")
+                    sys.exit(0)
             
                 # Send data
                 send_data = json.dumps(jsondata) # dict -> string
                 self.tcpSend(client_socket, send_data)
                 
-        except KeyboardInterrupt:
-            print(frontstr, "Client stopped")
-        except :
-            print(frontstr, "TCP protocol error")
+            except KeyboardInterrupt:
+                print(frontstr, "Client stopped")
+                break;
+            except Exception as e :
+                print(frontstr, "error > ", e)
 
         client_socket.close()
         self.bt_socket.close()

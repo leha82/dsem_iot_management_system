@@ -30,8 +30,8 @@ class ActuatorManager(threading.Thread):
     
     def run(self):  
             
-        try:
-            while True:
+        while True:
+            try:
                 print(frontstr, "try to connect actuator agent of server...")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_ACTUATOR))
@@ -48,10 +48,11 @@ class ActuatorManager(threading.Thread):
                     print(frontstr, "There is no event for all actutators")
 
                 sleep(5)
-        except KeyboardInterrupt:
-            print(frontstr, "Client stopped")
-        except :
-            print(frontstr, "TCP connection error")
+            except KeyboardInterrupt:
+                print(frontstr, "Client stopped")
+                break;
+            except Exception as e :
+                print(frontstr, "error > ", e)
 
         client_socket.close()
 
