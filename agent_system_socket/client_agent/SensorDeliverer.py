@@ -63,9 +63,11 @@ class SensorDeliverer(threading.Thread):
                 
                 # self.SYSTEM_ID = jsondata["system_id"]
                 
-                print(frontstr, "try to connect sensor agent of server...")
+                print(frontstr, "try to connect sensor collector...")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_SENSOR))
+
+                print(frontstr, "connection success!")
         
                 while True:
                     self.tcpSend(client_socket, self.SYSTEM_ID)

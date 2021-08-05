@@ -52,10 +52,10 @@ class SensorCollector (threading.Thread):
     def thread(self, client_socket, addr):
         try:
             system_id = self.receive(client_socket)
-            #print(receive_id)
+            print(frontstr, system_id)
 
             table_name, item_id = self.dbm.get_item_list(system_id)
-            #print("table name : ", table_name, ", item id : ", item_id)
+            print(frontstr, "table name : ", table_name, ", item id : ", item_id)
 
             if table_name != None and item_id != None:
                 self.send(client_socket, 'yes')
@@ -66,7 +66,7 @@ class SensorCollector (threading.Thread):
                 return
             
             receive_data = self.receive(client_socket)
-
+            
             if receive_data != "":
                 receive_data = receive_data.replace("'", "\"")
                 jsondata = json.loads(receive_data)
@@ -105,7 +105,8 @@ class SensorCollector (threading.Thread):
                 client_socket.close()
             
         except Exception as e :
-            self.send(client_socket, 'no')
-            print(frontstr, 'error :', e)
+            # self.send(client_socket, 'no')
+            print(frontstr, "error > ", e)
+            
             return
                 
