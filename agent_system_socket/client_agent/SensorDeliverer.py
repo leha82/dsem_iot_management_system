@@ -7,6 +7,8 @@ import json
 
 BUFFSIZE=1024
 
+frontstr = "SD >> "
+
 class SensorDeliverer(threading.Thread):
     def __init__(self, bt_socket, HOST, PORT_SENSOR, SYSTEM_ID):
         threading.Thread.__init__(self)
@@ -15,36 +17,25 @@ class SensorDeliverer(threading.Thread):
         self.PORT_SENSOR = PORT_SENSOR
         self.SYSTEM_ID = SYSTEM_ID
 
-    # json 형태로 변환
-    # def format_data(self, msg):
-    #     msg_list = msg.split(" ")
-        
-    #     humi = msg_list[0]
-    #     temp = msg_list[1]
-    #     cds = msg_list[2]
-    #     dust = msg_list[3]
-    #     led = msg_list[4]
-        
-    #     result = humi + "!" + temp + "!" + cds + "!" + dust + "!" + led
-    #     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    #     send_data = date + "!" + result
-    #     print(send_data)
-    #     return send_data
-
     def tcpSend(self, client_socket, message):
         client_socket.send(bytes(message,"UTF-8"))
-        print("SA >> tcp send : ", message)
+        print(frontstr, "send to server : ", message)
 
     def tcpReceive(self, client_socket):
         recv_msg = client_socket.recv(BUFFSIZE).decode("UTF-8")
-        print("SA >> tcp receive : ", recv_msg)
+        print(frontstr, "receive from server : ", recv_msg)
         return recv_msg
 
     def run(self):
         send_data=""
 
-        while True:
-            try:
+        # while True:
+        #     try:
+
+        try:
+            loop = True
+            while loop:
+
                 # Receive message from bluetooth
                 recv_string = ""
                 
@@ -56,36 +47,49 @@ class SensorDeliverer(threading.Thread):
                         break
                 
                 jsondata = json.loads(recv_string)
+                print(frontstr, "receive from bluetooth : ", jsondata)
                 #print(type(jsondata))
-                print(jsondata)
-                
-                self.SYSTEM_ID = jsondata["system_id"]
-                
-                print("SA >> try to connect sensor agent of server...")
+                # add system_id to json object
+                jsondata["system_id"] = self.SYSTEM_ID
+
+                print(frontstr, "Connecting sensor collector ... ")
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((self.HOST, self.PORT_SENSOR))
+                print(frontstr, "Connection success!!")
+
         
-                while True:
-                    self.tcpSend(client_socket, self.SYSTEM_ID)
-                    recv_msg = self.tcpReceive(client_socket)
+                # self.tcpSend(client_socket, self.SYSTEM_ID)
+                # recv_msg = self.tcpReceive(client_socket)
         
-                    if recv_msg == "yes":
-                        break
-                    elif recv_msg == "no":
-                        print("SA >> This device is not registered!")
-                        sys.exit(0)
-            
                 # Send data
                 send_data = json.dumps(jsondata) # dict -> string
                 self.tcpSend(client_socket, send_data)
-                
-            except KeyboardInterrupt:
-                print("SA >> Client stopped")
-                break
-            except :
-                print("SA >> TCP protocol error")
+                recv_msg = self.tcpReceive(client_socket)
+
+                if recv_msg == "notreg":
+                    print(frontstr, self.SYSTEM_ID, " : Device is not registered!")
+                    loop = False
+                elif recv_msg == "accept":
+                    print(frontstr, "Sensor data is stored.")
+                else:
+                    print(frontstr, recv_msg, ": Message is not defined")
+
+            # while-try style
+            # except KeyboardInterrupt:
+            #     print(frontstr, "Client stopped")
+            #     break;
+            # except Exception as e :
+            #     print(frontstr, "error > ", e)
+
+        # try-while style
+        except KeyboardInterrupt:
+            print(frontstr, "Sensor Deliverer is stopped")
+        except Exception as e :
+            print(frontstr, "Error is occured : ", e)
+
 
         client_socket.close()
-        print("SA >> close client socket")
+        print(frontstr, "Closing socket server")
+
    
 
