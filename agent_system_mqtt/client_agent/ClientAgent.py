@@ -5,7 +5,7 @@ import bluetooth
 import json
 import paho.mqtt.client as mqtt
 import SensorPublisher as sp
-#import ActuatorSubscriber as as
+import ActuatorSubscriber as AS
 
 if __name__ == "__main__":
     file_path = 'config.json'
@@ -30,13 +30,13 @@ if __name__ == "__main__":
     bt_socket.connect((BT_ADDR,BT_PORT))
     
     sensor = sp.SensorPublisher(bt_socket, MQTT_BROKER_IP, SYSTEM_ID)
-    #actuator = as.ActuatorSubscriber(bt_socket, MQTT_BROKER_IP, SYSTEM_ID)
+    actuator = AS.ActuatorSubscriber(bt_socket, MQTT_BROKER_IP, SYSTEM_ID)
     
     sensor.start()
-    #actuator.start()
+    actuator.start()
 
     sensor.join()    
-    #actuator.join()
+    actuator.join()
     
     bt_socket.close()
 

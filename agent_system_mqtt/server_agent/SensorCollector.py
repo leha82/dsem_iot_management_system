@@ -11,6 +11,7 @@ class SensorCollector (threading.Thread):
         threading.Thread.__init__(self)
         self.dbm = dbmanager
         self.mqtt_broker_host = mqtt_broker_host
+        self.system_id = ""
 
     # MQTT function
     def on_connect(self, client, userdata, flags, rc):
@@ -34,10 +35,10 @@ class SensorCollector (threading.Thread):
             jsondata = json.loads(receive_data)
             #print(type(jsondata))
     
-            system_id = jsondata["system_id"]
-            print(system_id)
+            self.system_id = jsondata["system_id"]
+            print(self.system_id)
 
-            table_name, item_id = self.dbm.get_item_list(system_id)
+            table_name, item_id = self.dbm.get_item_list(self.system_id)
             #print("table name : ", table_name, ", item id : ", item_id)
 
             del jsondata["system_id"]

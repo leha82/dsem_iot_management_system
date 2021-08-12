@@ -17,7 +17,7 @@ def printConfig(mqtt_broker_ip, db_host, db_port, db_user, db_pw, dbn_dr, dbn_me
 
 
 if __name__ == "__main__":
-    file_path = 'server_agent/config.json'
+    file_path = './agent_system_mqtt/server_agent/config.json'
     with open(file_path, "r") as fj:
         fd = json.load(fj)
         # server_ip = fd['SERVER_IP']
@@ -33,7 +33,7 @@ if __name__ == "__main__":
         tbl_specific = fd['TblName_SpecificMetadata']
         tbl_dl = fd['TblName_DeviceList']
 
-    printConfig(mqtt_broker_ip, db_host, db_port, db_user, db_pw, dbn_dr, dbn_measure, tbl_specific, tbl_dl)
+    #printConfig(mqtt_broker_ip, db_host, db_port, db_user, db_pw, dbn_dr, dbn_measure, tbl_specific, tbl_dl)
     # print(server_ip)
     dbm = DBManager.DBManager(db_host, db_port, db_user, db_pw, dbn_dr, dbn_measure, tbl_specific, tbl_dl)
     dbm.DB_Con()

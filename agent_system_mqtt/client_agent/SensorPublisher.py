@@ -60,7 +60,8 @@ class SensorPublisher(threading.Thread):
             jsondata["system_id"] = self.system_id
             print("system_id modified : ", jsondata)
             
-            # SYSTEM_ID = jsondata["system_id"]
+            #SYSTEM_ID = jsondata["system_id"]
+            #TOPIC = SYSTEM_ID + "/sensor"
             send_data = json.dumps(jsondata)
             # print("System ID : ", SYSTEM_ID)
 
