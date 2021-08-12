@@ -46,4 +46,4 @@ class ActuatorSubscriber(threading.Thread):
         client.connect(self.MQTT_BROKER_HOST, 1883)
         client.subscribe('data/actuator', 1)
         client.loop_forever()
-
+        client.disconnect()

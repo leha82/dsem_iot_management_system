@@ -18,8 +18,8 @@ String system_id = "DSEM_EIC01_0001";
 
 // Device perperty
 int LOOP_DELAY = 500;         // delay time per one loop (milli second)
-int SENSING_TIME = 5000;      // sensing duration (mili second)
-int ACTUATION_TIME = 1000;    //actuation duration
+int SENSING_TIME = 4000;      // sensing duration (mili second)
+//int ACTUATION_TIME = 1000;    //actuation duration
 int curr_time = 0;            // curr_time will increase LOOP_DELAY after one loop
 
 // 1602 LCD setting
@@ -82,7 +82,9 @@ void loop() {
       int index2 = recv.length();
       String actuator = recv.substring(0, index1);  
       String value = recv.substring(index1+1, index2);
-      //Serial.println(value);
+      Serial.print(actuator);
+      Serial.print("->");
+      Serial.println(value);
   
       if (actuator == "led") {
         led_status = value.toInt();
@@ -112,39 +114,40 @@ void loop() {
   // read cds
   cds = analogRead(CDS_PIN);
 
-  // send sensing data to raspberry pi per 5 sec
-  if(curr_time % SENSING_TIME == 0) {
-    //Display to 1602 LCD module
-    lcd.clear();
+  //Display to 1602 LCD module
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("H:");  lcd.print(humi);  lcd.print("%");
   
-    lcd.setCursor(0, 0);
-    lcd.print("H:");  lcd.print(humi);  lcd.print("%");
-    
-    lcd.setCursor(8, 0);
-    lcd.print("T:");  lcd.print(temp);  lcd.print("C");
-    
-    lcd.setCursor(0, 1);
-    lcd.print("D:");  lcd.print(disp_dust);  lcd.print("ug");
-    
-    lcd.setCursor(8, 1);
-    lcd.print("L:");  lcd.print(cds);
+  lcd.setCursor(8, 0);
+  lcd.print("T:");  lcd.print(temp);  lcd.print("C");
   
-    // LED Light Change
-    if (led_status==1) {
-      if (dust < 35) {           // air quality is good : blue light
-        led_red = 0;  led_green = 0;  led_blue = 255;
-      } else if (dust < 70) {    // air quality is normal : green light
-        led_red = 0;  led_green = 255;  led_blue = 0;
-      } else if (dust >= 100) {  // air quality is good : red light
-        led_red = 255;  led_green = 0;  led_blue = 0;
-      }
-    } else {
-      led_red = 0;  led_green = 0;  led_blue = 0;
+  lcd.setCursor(0, 1);
+  lcd.print("D:");  lcd.print(disp_dust);  lcd.print("ug");
+  
+  lcd.setCursor(8, 1);
+  lcd.print("L:");  lcd.print(cds);
+
+  // LED Light Change
+  if (led_status==1) {
+    if (dust < 35) {           // air quality is good : blue light
+      led_red = 0;  led_green = 0;  led_blue = 255;
+    } else if (dust < 70) {    // air quality is normal : green light
+      led_red = 0;  led_green = 255;  led_blue = 0;
+    } else if (dust >= 100) {  // air quality is good : red light
+      led_red = 255;  led_green = 0;  led_blue = 0;
     }
-    analogWrite(LEDRED_PIN, led_red);
-    analogWrite(LEDGREEN_PIN, led_green);
-    analogWrite(LEDBLUE_PIN, led_blue);
-    
+  } else {
+    led_red = 0;  led_green = 0;  led_blue = 0;
+  }
+  analogWrite(LEDRED_PIN, led_red);
+  analogWrite(LEDGREEN_PIN, led_green);
+  analogWrite(LEDBLUE_PIN, led_blue); 
+
+  // send sensing data to raspberry pi per 5 sec
+  if(curr_time >= SENSING_TIME) {
+
     // create sensor message in json and send it format using bluetooth module
     String jsondata = "";
 
