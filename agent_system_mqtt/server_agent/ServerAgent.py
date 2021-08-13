@@ -20,9 +20,6 @@ if __name__ == "__main__":
     file_path = './agent_system_mqtt/server_agent/config.json'
     with open(file_path, "r") as fj:
         fd = json.load(fj)
-        # server_ip = fd['SERVER_IP']
-        # port_sensor = fd['PORT_Sensor']
-        # port_actuator = fd['PORT_Actuator']
         mqtt_broker_ip = fd['MQTT_BROKER_IP']
         db_host = fd['DB_Host']
         db_port = fd['DB_Port']

@@ -11,9 +11,6 @@ if __name__ == "__main__":
     file_path = 'config.json'
     with open(file_path, "r") as fj:
         fd = json.load(fj)
-        # HOST = fd['SERVER_IP']
-        # PORT_SENSOR = fd['SERVER_PORT_SENSOR']
-        # PORT_ACTUATOR = fd['SERVER_PORT_ACTUATOR']
         MQTT_BROKER_IP = fd['MQTT_BROKER_IP']
         BT_ADDR = fd['BT_ADDR']
         BT_PORT = fd['BT_PORT']
