@@ -36,10 +36,6 @@ if __name__ == "__main__":
     dbm.DB_Con()
 
     sensor_collector = SensorCollector.SensorCollector(dbm, mqtt_broker_ip)
-    # actuator_collector = ActuatorController.ActuatorController(dbm, mqtt_broker_ip)
     
     sensor_collector.start()
-    # actuator_collector.start()
-
-    # actuator_collector.join()
     sensor_collector.join()  

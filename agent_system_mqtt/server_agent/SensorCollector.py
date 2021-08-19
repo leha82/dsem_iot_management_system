@@ -1,7 +1,6 @@
 import threading
 import DBManager
 import json
-import socket
 import paho.mqtt.client as mqtt
 
 BUFFSIZE = 4096
@@ -88,11 +87,7 @@ class SensorCollector (threading.Thread):
             client.on_message = self.on_message
 
             client.connect(self.mqtt_broker_host, 1883)
-            client.subscribe('data/sensor', 1)
+            client.subscribe('device0004/sensor', 1)
             client.loop_forever()
 
             client.disconnect()
-            # client.loop_forever() 를 사용하는 경우, 메소드는 현재 스레드를 사용하여 클라이언트의 네트워크
-            # 스레드를 실행하고 해당 호출에서 해당 블록을 실행
-            # client.loop_start() 를 사용하는 경우 그런 다음 백그라운드에서 새 스레드를 시작하여 네트워크 루프
-            # 와 모든 콜백을 실행

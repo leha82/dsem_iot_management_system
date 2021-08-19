@@ -60,15 +60,15 @@ class SensorPublisher(threading.Thread):
             jsondata["system_id"] = self.system_id
             print("system_id modified : ", jsondata)
             
-            #SYSTEM_ID = jsondata["system_id"]
-            #TOPIC = SYSTEM_ID + "/sensor"
+            SYSTEM_ID = jsondata["system_id"]
+            TOPIC = SYSTEM_ID + "/sensor"
             send_data = json.dumps(jsondata)
-            # print("System ID : ", SYSTEM_ID)
+            print("System ID : ", SYSTEM_ID)
 
             
             client.connect(self.broker_ip, 1883)
             client.loop_start()
-            client.publish('data/sensor', send_data, 1)
+            client.publish(TOPIC, send_data, 1)
             client.loop_stop()
             client.disconnect()
 
