@@ -1,0 +1,5 @@
+{
+    "BT_ADDR" : ["input bluetooth address 1","input bluetooth address 2","input bluetooth address 1 3"],
+	"SYSTEM_ID" :["systemid_001","systemid_003","systemid_004"],
+    "BT_PORT" : "PORT NUM"
+}

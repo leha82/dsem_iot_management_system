@@ -1,5 +1,5 @@
 {
     "BT_ADDR" : ["20:13:06:18:10:53","98:D3:51:FD:B7:C7"],
     "SYSTEM_ID": ["testdevice01","device0004"],
-    "BT_PORT" : 9600
+    "BT_PORT" : 1
 }
