@@ -1,2 +1,4 @@
 config.json
+ble_config.json  
 *.pyc
+agent_system_mqtt/client_agent/ble_config_templete.json
