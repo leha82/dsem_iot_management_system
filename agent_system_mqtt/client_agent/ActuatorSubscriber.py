@@ -10,7 +10,8 @@ class ActuatorSubscriber(threading.Thread):
         threading.Thread.__init__(self) 
         self.bt_socket = bt_socket 
         self.MQTT_BROKER_HOST = MQTT_BROKER_HOST
-        self.SYSTEM_ID = SYSTEM_ID 
+        self.SYSTEM_ID = SYSTEM_ID
+        self.topic=self.SYSTEM_ID+"/COMMAND"
       
     # MQTT function
     def on_connect(self, client, userdata, flags, rc):
@@ -44,6 +45,6 @@ class ActuatorSubscriber(threading.Thread):
         client.on_message = self.on_message
         
         client.connect(self.MQTT_BROKER_HOST, 1883)
-        client.subscribe('device0004/actuator', 1)
+        client.subscribe(self.topic, 1)
         client.loop_forever()
         client.disconnect()

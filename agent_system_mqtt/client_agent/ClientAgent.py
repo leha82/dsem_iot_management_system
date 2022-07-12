@@ -9,12 +9,14 @@ import ActuatorSubscriber as AS
 
 if __name__ == "__main__":
     file_path = 'config.json'
+    bluetooth_file_path ='ble_config.json'
     with open(file_path, "r") as fj:
         fd = json.load(fj)
         MQTT_BROKER_IP = fd['MQTT_BROKER_IP']
         BT_ADDR = fd['BT_ADDR']
         BT_PORT = fd['BT_PORT']
         SYSTEM_ID = fd['SYSTEM_ID']
+        list_ble= 0
 
     # print("Server Host Sensor : ", HOST, " | Port : ", PORT_SENSOR)
     # print("Server Host Actuator : ", HOST, " | Port : ", PORT_ACTUATOR)
