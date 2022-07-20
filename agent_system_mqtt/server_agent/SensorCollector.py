@@ -42,10 +42,11 @@ class SensorCollector (threading.Thread):
             # make key list and value list from received json data
             key_list = []
             value_list = []
-            for i in jsondata['content']:
-                for key,value in i:
-                    key_list.append(key)
-                    value_list.append(value)
+            temp_object=jsondata['content']
+            for key in temp_object:
+                key_list.append(key)
+                value_list.append(temp_object.get(key))
+                #print("{}, {}".format(key,temp_object.get(key)))
 
             # get sensor and actuator list from specific metadata table in database
             DB_column = []
@@ -84,7 +85,7 @@ class SensorCollector (threading.Thread):
             client.on_message = self.on_message
 
             client.connect(self.mqtt_broker_host, 1883)
-            client.subscribe('+/sensor', 1)
+            client.subscribe('+/DATA', 1)
             client.loop_forever()
 
             client.disconnect()

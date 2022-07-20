@@ -17,7 +17,7 @@ def printConfig(mqtt_broker_ip, db_host, db_port, db_user, db_pw, dbn_dr, dbn_me
 
 
 if __name__ == "__main__":
-    file_path = './agent_system_mqtt/server_agent/config.json'
+    file_path = './config.json'
     with open(file_path, "r") as fj:
         fd = json.load(fj)
         mqtt_broker_ip = fd['MQTT_BROKER_IP']

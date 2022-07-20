@@ -44,9 +44,9 @@ class DBManager:
 
     # get sensor list and actuator list from specific metadata table
     def get_sensor_actuator_list(self, item_id):
-        sql = "SELECT metadata_value FROM " + self.DBN_dr + '.' + self.tbl_specific + \
-                            " WHERE item_id = " + self.addsq(item_id) + " AND (metadata_key like " + self.addsq('sensor-%') + \
-                            " OR metadata_key like " + self.addsq('actuator-%') +");"
+        sql = "SELECT md_value FROM " + self.DBN_dr + '.' + self.tbl_specific + \
+                            " WHERE item_id = " + self.addsq(item_id) + " AND (md_key like " + self.addsq('sensor') + \
+                            " OR md_key like " + self.addsq('actuator') +");"
         #print("dbm >> ", sql)
         num=self.curs.execute(sql) 
         DB_column=self.curs.fetchall()
