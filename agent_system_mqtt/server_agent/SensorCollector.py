@@ -10,7 +10,6 @@ class SensorCollector (threading.Thread):
         threading.Thread.__init__(self)
         self.dbm = dbmanager
         self.mqtt_broker_host = mqtt_broker_host
-        self.system_id = ""
 
     # MQTT function
     def on_connect(self, client, userdata, flags, rc):
@@ -34,21 +33,19 @@ class SensorCollector (threading.Thread):
             jsondata = json.loads(receive_data)
             #print(type(jsondata))
     
-            self.system_id = jsondata["system_id"]
-            print(self.system_id)
+            system_id = jsondata["system_id"]
+            print(system_id)
 
-            table_name, item_id = self.dbm.get_item_list(self.system_id)
+            table_name, item_id = self.dbm.get_item_list(system_id)
             #print("table name : ", table_name, ", item id : ", item_id)
-
-            del jsondata["system_id"]
-            print("receive_data:", jsondata)
 
             # make key list and value list from received json data
             key_list = []
             value_list = []
-            for key, value in jsondata.items():
-                key_list.append(key)
-                value_list.append(value)
+            for i in jsondata['content']:
+                for key,value in i:
+                    key_list.append(key)
+                    value_list.append(value)
 
             # get sensor and actuator list from specific metadata table in database
             DB_column = []
@@ -87,7 +84,7 @@ class SensorCollector (threading.Thread):
             client.on_message = self.on_message
 
             client.connect(self.mqtt_broker_host, 1883)
-            client.subscribe('device0004/sensor', 1)
+            client.subscribe('+/sensor', 1)
             client.loop_forever()
 
             client.disconnect()
